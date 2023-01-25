@@ -24,3 +24,9 @@ class Cols:
                     self.x.append(col)
                 if s[-1] == '!':
                     self.klass = col
+
+    def add(self, row):
+        for _, names in enumerate({self.x, self.y}):
+            for _, col in enumerate(names):
+                col.add(row.cells[]) #TODO what is .at
+
