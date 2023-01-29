@@ -1,0 +1,6 @@
+the:
+  dump: true
+  eg: ALL
+  go: data
+  help: true
+  seed: 100

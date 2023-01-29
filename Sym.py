@@ -4,7 +4,7 @@ import math
 
 
 class Sym:
-    def __init__(self, col_position=0, col_name=""):
+    def __init__(self):
         self.num_items = 0  # items seen
         self.has = defaultdict(int)  # kept data
 
@@ -31,7 +31,6 @@ class Sym:
             return p * math.log(p, 2)
 
         for n in self.has.values():
-            if n > 0:
-                e = e - fun(n / self.num_items)
+            e = e + fun(n / self.num_items)
 
-        return e
+        return -e
