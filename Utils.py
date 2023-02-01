@@ -1,6 +1,7 @@
 from subprocess import call
 import yaml
 import math
+import random
 
 with open("config.yml", "r") as config_file:
     configs = yaml.safe_load(config_file)
@@ -35,10 +36,14 @@ def rand(lo, hi):
     :param hi: Higher limit of generated number
     :return: Pseudo-random number
     """
-    lo, hi = lo or 0, hi or 1
+    if not lo:
+        lo = 0
 
-    seed = (16807 * configs['the']['dump']) % 2147483647
-    return lo + (hi - lo) * seed / 2147483647
+    if not hi:
+        hi = 1
+
+    configs['the']['seed'] = (16807 * configs['the']['seed']) % 2147483647
+    return lo + (hi - lo) * configs['the']['seed'] / 2147483647
 
 
 def rnd(x, places=2):
@@ -88,7 +93,7 @@ def cli(args, configs):
                 configs['the']['help'] = False
             continue
         elif arg_arr[x] == "-s":
-            configs['the']['seed'] = int(arg_arr[x + 1])
+            set_seed(int(arg_arr[x + 1]))
             continue
         elif arg_arr[x] == "-q":
             print("Exiting.")
@@ -101,3 +106,7 @@ def cli(args, configs):
         call(["python", "/Tests.py"])
 
     return configs
+
+
+def set_seed(x):
+    configs['the']['seed'] = x

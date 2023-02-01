@@ -3,7 +3,7 @@ import sys
 import TestEngine
 from Num import Num
 from Sym import Sym
-from Utils import rnd, canPrint, rand
+from Utils import rnd, canPrint, rand, set_seed
 
 
 @TestEngine.test
@@ -16,9 +16,12 @@ def eg_the():
 def eg_rand():
     num1, num2 = Num(), Num()
 
+    set_seed(937162211)
     for i in range(1, 10 ** 3 + 1):
-        num1.add(rand(0, 1))
+        x = rand(0, 1)
+        num1.add(x)
 
+    set_seed(937162211)
     for i in range(1, 10 ** 3 + 1):
         num2.add(rand(0, 1))
 

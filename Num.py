@@ -12,15 +12,14 @@ class Num:
         self.is_sorted = True  # no updates since last sort of data
 
     # Reservoir sampler
-    def add(self, n):
+    def add(self, n: float):
         if n != '?':
-            value = int(n)
             self.num_items += 1
-            d = value - self.mu
-            self.mu += d/self.num_items
-            self.m2 += d*(self.num_items - self.mu)
-            self.lo = min(self.lo, value)
-            self.hi = max(self.hi, value)
+            d = n - self.mu
+            self.mu += (d/self.num_items)
+            self.m2 += d*(n - self.mu)
+            self.lo = min(n, self.lo)
+            self.hi = max(n, self.hi)
 
 
     # Central tendency; for Nums, this is mean
@@ -29,7 +28,4 @@ class Num:
 
     # Diversity; for Nums, this is standard deviation using Welford's alg
     def div(self):
-        if self.m2 < 0 or self.num_items < 2:
-            return 0
-        else:
-            return math.pow(self.m2/(self.num_items-1), 0.5)
+        return 0 if (self.m2 < 0 or self.num_items < 2) else math.pow((self.m2 / (self.num_items - 1)), 0.5)
