@@ -1,9 +1,13 @@
 from subprocess import call
-import yaml
 import math
-import random
+import yaml
+from pathlib import Path
+import Common
 
-with open("config.yml", "r") as config_file:
+my_path = Path(__file__).resolve()  # resolve to get rid of any symlinks
+config_path = my_path.parent / 'config.yml'
+
+with config_path.open() as config_file:
     configs = yaml.safe_load(config_file)
 
 passer = ""
