@@ -68,6 +68,24 @@ def coerce(s):
         return None or fun(s)
 
 
+# Call "fun" on each row. Row cells are divided in "the.seperator"
+def csv(fname, fun=None):
+    if fname is None or len(fname.strip()) == 0:
+        raise Exception("File not found")
+    else:
+        sep = Common.cfg['the']['separator']
+        with open(fname, 'r') as s:
+            for s1 in s.readlines():
+                t = []
+                csv_row = s1.split(sep)  # Split a row using the separator, here ','
+                csv_row[-1] = csv_row[-1][:-1]  # Removing \n from the end of last element
+                for cell in csv_row:
+                    t.append(coerce(cell))          # Every cell should be type casted
+                if fun:
+                    fun(t)
+
+
+
 def cli(args, configs):
     arg_arr = args.split(" ")
 

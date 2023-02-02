@@ -1,9 +1,9 @@
-import Common
 import sys
 import TestEngine
+import Common
 from Num import Num
 from Sym import Sym
-from Utils import rnd, canPrint, rand, set_seed
+from Utils import rnd, canPrint, rand, set_seed, csv
 
 
 @TestEngine.test
@@ -59,6 +59,7 @@ def eg_num():
     canPrint(results, 'Should be able to print mid and div')
 
     return 11/7 == mid and 0.787 == div
+
 
 
 @TestEngine.test
