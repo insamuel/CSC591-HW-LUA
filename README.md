@@ -7,4 +7,20 @@
 
 # CSC591-HW-LUA
 
+Group Members: Isabella Samuelsson, Rithik Jain, Katherine Mitchell
+
+
+
+
+Running
+
+Repository for all homeworks for CSC591.
+
+To run HW1, navigate to \HW1\src and run 'python script.py'.
+HW1 tests are contained in HW1\test and can be run all together by 'python Tests.py'.
+
+To run HW2, IN PROGRESS
+
+
+
 
