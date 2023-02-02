@@ -17,6 +17,8 @@ Repository for all homeworks for CSC591.
 
 - To run HW2, IN PROGRESS
 
+- To run HW3, IN PROGRESS
+
 
 
 
