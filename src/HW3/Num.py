@@ -82,10 +82,11 @@ class Num:
     ##
     # Central tendency; for Nums, this is mean
     #
-    # The mid method returns the current mean (average) of the data that has been processed till now, as
-    # denoted by the mu variable. mu is updated whenever new data is added to the class using the
-    # add method. By returning self.mu, the mid method provides a way for code that uses the Num class to
-    # access the current mean of the data.
+    # The mid method returns the current mean (average) of the data that
+    # has been processed till now, as denoted by the mu variable. mu is
+    # updated whenever new data is added to the class using the
+    # add method. By returning self.mu, the mid method provides a way for
+    # code that uses the Num class to access the current mean of the data.
     ##
     def mid(self):
         return self.mu
@@ -95,10 +96,13 @@ class Num:
     #
     # Calculates the standard deviation of the data processed so far.
     #
-    # To calculate the standard deviation, the method first checks if either self.m2 is negative or self.# num_items is less than 2. If either of these conditions is true, the method returns 0.
+    # To calculate the standard deviation, the method first checks if
+    # either self.m2 is negative or self.# num_items is less than 2. If
+    # either of these conditions is true, the method returns 0.
     #
-    # If both conditions are false, the method calculates the square root of self.m2 (sum of the squares
-    # of the deviations from the mean divided by self.num_items - 1 (number of items processed so far
+    # If both conditions are false, the method calculates the square root
+    # of self.m2 (sum of the squares of the deviations from the mean
+    # divided by self.num_items - 1 (number of items processed so far
     # - 1) using the math.pow function, and returns the result.
     ##
     def div(self):

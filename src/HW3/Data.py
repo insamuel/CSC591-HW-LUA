@@ -79,4 +79,4 @@ class Data:
             s1 = s1 - math.exp(col.w * (x-y)/len(ys))
             s2 = s2 - math.exp(col.w * (y-x)/len(ys))
 
-    return s1/len(ys) < s2/len(ys)
+        return s1/len(ys) < s2/len(ys)
