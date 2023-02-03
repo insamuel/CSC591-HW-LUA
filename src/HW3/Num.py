@@ -103,3 +103,14 @@ class Num:
     ##
     def div(self):
         return 0 if (self.m2 < 0 or self.num_items < 2) else math.pow((self.m2 / (self.num_items - 1)), 0.5)
+
+    ##
+    # To normalize a numerical value "n" based on the "lo" and "hi" values
+    # of an instance of the "NUM" class. We add "1E-32" to prevent a
+    # division by zero.
+    ##
+    def norm(i, n):
+        if n == "?"
+            return n
+        else
+            return (n - i.lo) / (i.hi - i.lo + 1e-32)
