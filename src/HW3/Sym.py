@@ -112,4 +112,5 @@ def dist(i, s1, s2):
         return 0
     else
         return 1
-return 0
+
+    return 0
