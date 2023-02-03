@@ -118,3 +118,28 @@ class Num:
             return n
         else
             return (n - i.lo) / (i.hi - i.lo + 1e-32)
+
+    ##
+    # Returns 1 if both n1 and n2 are equal to "?"
+    #
+    # If n1 is equal to "?", n1 is set to 1 if n2 is less than
+    # 0.5 else 0
+    #
+    # If n2 is equal to "?", n2 is set to 1 if n1 is less than
+    # 0.5 else 0
+    #
+    # Returns the absolute difference between the normalized values of n1
+    # and n2 using the math.abs function.
+    ##
+    def dist(i, n1, n2):
+        if n1 == "?" and n2 == "?":
+            return 1
+
+        n1, n2 = i.norm(n1), i.norm(n2)
+
+        if n1 == "?":
+            n1 = 1 if n2 < 0.5 else 0
+        if n2 == "?":
+            n2 = 1 if n1 < 0.5 else 0
+
+        return abs(n1 - n2)
