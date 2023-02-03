@@ -80,3 +80,21 @@ class Data:
             s2 = s2 - math.exp(col.w * (y-x)/len(ys))
 
         return s1/len(ys) < s2/len(ys)
+
+    ##
+    # Defines a function "dist" that calculates the distance between two
+    # rows row1 and row2.
+    #
+    # col.dist calculates the distance between two values in a column.
+    # row1.cells[col.at] and row2.cells[col.at] are the values in the
+    # column col of row1 and row2 respectively.
+    ##
+    def dist(i, row1, row2, cols, n = 0, d = 0):
+        if cols is None:
+            cols = i.cols.x
+
+        for col in cols:
+            n += 1
+            d += pow(col.dist(row1.cells[col.at], row2.cells[col.at]), the.p)
+
+        return pow(d / n, 1 / the.p)
