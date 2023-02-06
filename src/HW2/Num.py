@@ -1,15 +1,19 @@
 import math
+import Utils
 
 
 # Num summarizes a stream of numbers
 class Num:
-    def __init__(self, col_position=0, col_name=""):
+    def __init__(self, at=0, txt=""):
+        self.at = at
+        self.txt = txt
         self.num_items = 0  # items seen
         self.mu = 0
         self.m2 = 0
         self.lo = math.inf  # lowest seen
         self.hi = -math.inf  # highest seen
         self.is_sorted = True  # no updates since last sort of data
+        self.w = 1 if txt and txt[-1] == '+' else -1  # maximize or minimize column
 
     # Reservoir sampler
     def add(self, n: float):
@@ -29,3 +33,7 @@ class Num:
     # Diversity; for Nums, this is standard deviation using Welford's alg
     def div(self):
         return 0 if (self.m2 < 0 or self.num_items < 2) else math.pow((self.m2 / (self.num_items - 1)), 0.5)
+
+    # Rounding: Round the num to n places
+    def rnd(self, x, n):
+        return Utils.rnd(x, n)

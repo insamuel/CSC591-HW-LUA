@@ -29,19 +29,26 @@ class Data:
         if not self.cols:
             self.cols = Cols(t)
         else:
-            row = t if type(t) == Row else Row(t)
-            self.rows.append(row)
-            for todo in [self.cols.x, self.cols.y]:
-                for col in todo:
-                    col.add(row.cells[col.col_position])
+            t = t.cells if hasattr(t, "cells") else Row(t)
+            self.rows.append(t)
+            self.cols.add(t)
 
     def clone(self, init, x):
         data = Data({self.cols.names})
         map(init or {}, data.add(x))
         return data
 
-    # Rounding numbers to 'places' (default=2)
-    # For showCols, default = self.cols.y
-    # No defaults for fun
+    # Rounding numbers to 'nplaces' (default=2)
+    # For cols, default = self.cols.y
+    # No defaults for what
     def stats(self, what, cols, nplaces):
-        return dict(sorted({col.txt: col.rnd(getattr(col, what)(), nplaces) for col in cols or self.cols.y}.items()))
+        if not cols:
+            cols = self.cols.y
+        t = {}
+        for col in cols:
+            v = what(col)
+            if isinstance(v, numbers.Number):
+                t[col.txt] = rnd(v, nplaces)
+            else:
+                t[col.txt] = v
+        return t

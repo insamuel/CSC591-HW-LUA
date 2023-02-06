@@ -72,13 +72,12 @@ def eg_data():
 @TestEngine.test
 def eg_csv():
     def fun(row):
-        fun.n += 1
-        if fun.n > 10:
-            return
-        canPrint(row, 'Should be able to print rows')
+        fun.n += len(row)
+        if fun.n < 8 * 25:
+            canPrint(row, 'Should be able to print rows')
 
     fun.n = 0
-    csv('data/auto93.csv', fun)
+    csv(Common.cfg['the']['file'], fun)
     return fun.n == 8 * 399
 
 
@@ -96,15 +95,15 @@ def eg_stats():
         else:
             return Sym.mid(col)
 
-    data = Data('data/auto93.csv')
+    data = Data(Common.cfg['the']['file'])
     print('xmid', end='\t')
-    canPrint(data.stats(2, data.cols.x, mid), 'xmid')
+    canPrint(data.stats(mid, data.cols.x, 2), 'xmid')
     print('xdiv', end='\t')
-    canPrint(data.stats(3, data.cols.x, div), 'xdiv')
+    canPrint(data.stats(div, data.cols.x, 3), 'xdiv')
     print('ymid', end='\t')
-    canPrint(data.stats(2, data.cols.y, mid), 'ymid')
+    canPrint(data.stats(mid, data.cols.y, 2), 'ymid')
     print('ydiv', end='\t')
-    canPrint(data.stats(3, data.cols.x, div), 'ydiv')
+    canPrint(data.stats(div, data.cols.x, 3), 'ydiv')
     return True
 
 

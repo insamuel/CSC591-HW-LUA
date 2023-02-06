@@ -4,7 +4,9 @@ import math
 
 
 class Sym:
-    def __init__(self):
+    def __init__(self, at=0, txt=""):
+        self.at = at
+        self.txt = txt
         self.num_items = 0  # items seen
         self.has = defaultdict(int)  # kept data
 
@@ -34,3 +36,9 @@ class Sym:
             e = e + fun(n / self.num_items)
 
         return -e
+
+    # Rounding: For Sym just return value because can't round a sym
+    def rnd(self, x, n):
+        return x
+
+
