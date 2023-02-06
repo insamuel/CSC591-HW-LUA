@@ -13,9 +13,9 @@ Group Members: Isabella Samuelsson, Rithik Jain, Katherine Mitchell
 
 Repository for all homeworks for CSC591.
 
-- To run HW1, navigate to \HW1\src and run 'python script.py'. HW1 tests are contained in HW1\test and can be run all together by 'python Tests.py'.
+- To run HW1, navigate to \src\HW1 and run 'python script.py'. HW1 tests are contained in \src\HW1 and can be run all together by 'python Tests.py'.
 
-- To run HW2, IN PROGRESS
+- To run HW2, navigate to \src\HW2 and run 'python main.py'. HW2 tests are contained in \src\HW2 and can be run all together by 'python Tests.py'. 
 
 - To run HW3, IN PROGRESS
 
