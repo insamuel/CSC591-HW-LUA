@@ -77,7 +77,7 @@ def csv(fname, fun=None):
     if fname is None or len(fname.strip()) == 0:
         raise Exception("File not found")
     else:
-        sep = Common.cfg['the']['separator']
+        sep = ","
         with open(fname, 'r') as s:
             for s1 in s.readlines():
                 t = []

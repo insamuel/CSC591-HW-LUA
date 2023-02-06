@@ -64,7 +64,7 @@ def eg_num():
 
 @TestEngine.test
 def eg_data():
-    data = Data('data/auto93.csv')
+    data = Data(Common.cfg['the']['file'])
 
     return len(data.rows) == 398 and data.cols.y[0].w == -1 and data.cols.x[0].at == 0 and len(data.cols.x) == 4
 

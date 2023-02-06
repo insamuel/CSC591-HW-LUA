@@ -2,7 +2,6 @@ from subprocess import call
 import math
 import yaml
 from pathlib import Path
-import Common
 
 my_path = Path(__file__).resolve()  # resolve to get rid of any symlinks
 config_path = my_path.parent / 'config.yml'
@@ -77,8 +76,9 @@ def csv(fname, fun=None):
     if fname is None or len(fname.strip()) == 0:
         raise Exception("File not found")
     else:
-        sep = Common.cfg['the']['separator']
-        with open(fname, 'r') as s:
+        sep = ","
+        file_path = my_path.parent.parent.parent / "etc" / fname
+        with open(file_path, 'r') as s:
             for s1 in s.readlines():
                 t = []
                 csv_row = s1.split(sep)  # Split a row using the separator, here ','
@@ -87,7 +87,6 @@ def csv(fname, fun=None):
                     t.append(coerce(cell))          # Every cell should be type casted
                 if fun:
                     fun(t)
-
 
 
 def cli(args, configs):
@@ -107,6 +106,9 @@ def cli(args, configs):
             continue
         elif arg_arr[x] == "-g":
             configs['the']['go'] = str(arg_arr[x + 1])
+            continue
+        elif arg_arr[x] == "-f":
+            configs['the']['file'] = str(arg_arr[x + 1])
             continue
         elif arg_arr[x] == "-h":
             if arg_arr[x + 1] == 'True' or arg_arr[x + 1] == 'true':

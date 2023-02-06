@@ -5,9 +5,10 @@ from Utils import cli
 with open("config.yml", "r") as config_file:
     configs = yaml.safe_load(config_file)
 
-print("script.py : an example script with help text and a test suite\n")
-print("USAGE: script.py [OPTIONS] [-g ACTION] \n OPTIONS:\n"
+print("main.py : an example script with help text and a test suite\n")
+print("USAGE: main.py [OPTIONS] [-g ACTION] \n OPTIONS:\n"
       " -d  --dump  on crash, dump stack = false \n"
+      " -f  --file  name of file         = ../etc/data/auto93.csv \n"
       " -g  --go    start-up action      = data\n"
       " -h  --help  show help            = false\n" 
       " -s  --seed  random number seed   = 937162211 \n"
