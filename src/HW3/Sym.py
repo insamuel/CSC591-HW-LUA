@@ -129,8 +129,8 @@ class Sym:
     ##
     # Returns `n` unchanged (SYMs do not get rounded)
     ##
-    def rnd(self, value, num_items):
-        return num_items
+    def rnd(self, value, n):
+        return value
 
 ##
 # Defined a function dis which take 3 arguments. i, s1 and s2.
@@ -139,7 +139,7 @@ class Sym:
 # 0 if "s1" and "s2" are equal to each other
 # 1 if "s1" and "s2" are not equal to each other or not equal to "?"
 ##
-def dist(i, s1, s2):
+def dist(self, s1, s2):
     if s1 == "?" and s2 == "?":
         return 1
     elif s1 == s2:
