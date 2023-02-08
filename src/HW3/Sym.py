@@ -121,8 +121,8 @@ class Sym:
         def fun(p):
             return p * math.log(p, 2)
 
-        for n in self.has.values():
-            e = e + fun(n / self.num_items)
+        for num_items in self.has.values():
+            e = e + fun(num_items / self.num_items)
 
         return -e
 
