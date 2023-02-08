@@ -120,9 +120,9 @@ class Num:
     # division by zero.
     ##
     def norm(i, n):
-        if n == "?"
+        if n == "?":
             return n
-        else
+        else:
             return (n - i.lo) / (i.hi - i.lo + 1e-32)
 
     ##
