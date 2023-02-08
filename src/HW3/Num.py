@@ -37,12 +37,18 @@ class Num:
     # updated since the last sort.
     ##
     def __init__(self, col_position=0, col_name=""):
-        self.num_items  = 0  # items seen
-        self.mu         = 0
-        self.m2         = 0
-        self.lo         = math.inf  # lowest seen
-        self.hi         = -math.inf  # highest seen
-        self.is_sorted  = True  # no updates since last sort of data
+        self.col_position   = col_position
+        self.col_name       = col_name
+        self.num_items      = 0         # items seen
+        self.mu             = 0
+        self.m2             = 0
+        self.lo             = math.inf  # lowest seen
+        self.hi             = -math.inf # highest seen
+
+        if self.col_name.find("-$") != -1:
+            self.w = -1
+        else:
+            self.w = 1
 
     ##
     # Reservoir sampler
