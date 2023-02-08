@@ -115,6 +115,17 @@ class Num:
         return 0 if (self.m2 < 0 or self.num_items < 2) else math.pow((self.m2 / (self.num_items - 1)), 0.5)
 
     ##
+    # Checks if value is equal to "?". If it is, it returns value as is. If
+    # not, it returns the rounded value to n decimal places using the
+    # round function.
+    ##
+    def rnd(self, value, n):
+        if value == "?":
+            return value
+        else:
+            return round(value, n)
+
+    ##
     # To normalize a numerical value "n" based on the "lo" and "hi" values
     # of an instance of the "NUM" class. We add "1E-32" to prevent a
     # division by zero.
