@@ -29,9 +29,13 @@ import math
 # Sym.
 ##
 class Sym:
-    def __init__(self):
-        self.num_items = 0              # items seen
-        self.has = defaultdict(int)     # kept data
+    def __init__(self, at=0, txt=""):
+        self.at = at
+        self.txt = txt
+        self.n = 0
+        self.has = {}
+        self.most = 0
+        self.mode = None
 
     ##
     # Add symbol value to Sym object
@@ -44,9 +48,34 @@ class Sym:
     # Increments the frequency count of the value in the 'has' defaultdict # by 1.
     ##
     def add(self, value):
+
+        ##
+        # If value is not equal to "?", the method proceeds to update the
+        # counts.
+        #
+        # The line self.num_items += 1 increments the count by 1.
+        #
+        # The second if increments the count of the value in a dictionary
+        # self.has. Returns the value of self.has[value] if it exists, or 0
+        # if it doesn't. Then adds 1 to the value returned. This increments
+        # the count of the value in the dictionary self.has.
+        ##
         if value != "?":
             self.num_items += 1
-            self.has[value] += 1
+
+            if value in self.has:
+                self.has[value] += 1
+            else:
+                self.has[value] = 1
+
+        ##
+        # Updates the values of self.most and self.mode if the count of value in
+        # self.has is greater than the current value of self.most. If this is the
+        # case, self.most is set to the count of value, and self.mode is set to value.
+        ##
+        if self.has[value] > self.most:
+            self.most = self.has[value]
+            self.mode = value
 
     ##
     # Calculates the mode, most common symbol
