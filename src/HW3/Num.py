@@ -75,14 +75,14 @@ class Num:
     # hi is updated to be the maximum between the current value of hi and
     # the new value n.
     ##
-    def add(self, n: float):
-        if n != '?':
+    def add(self, num_items: float):
+        if num_items != '?':
             self.num_items  += 1
-            d               = n - self.mu
+            d               = num_items - self.mu
             self.mu         += (d / self.num_items)
-            self.m2         += d * (n - self.mu)
-            self.lo         = min(n, self.lo)
-            self.hi         = max(n, self.hi)
+            self.m2         += d * (num_items - self.mu)
+            self.lo         = min(num_items, self.lo)
+            self.hi         = max(num_items, self.hi)
 
 
     ##
