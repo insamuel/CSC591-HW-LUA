@@ -132,17 +132,17 @@ class Sym:
     def rnd(self, value, n):
         return value
 
-##
-# Defined a function dis which take 3 arguments. i, s1 and s2.
-#
-# 1 if "s1" and "s2" are both equal to "?"
-# 0 if "s1" and "s2" are equal to each other
-# 1 if "s1" and "s2" are not equal to each other or not equal to "?"
-##
-def dist(self, s1, s2):
-    if s1 == "?" and s2 == "?":
-        return 1
-    elif s1 == s2:
-        return 0
-    else:
-        return 1
+    ##
+    # Defined a function dis which take 3 arguments. i, s1 and s2.
+    #
+    # 1 if "s1" and "s2" are both equal to "?"
+    # 0 if "s1" and "s2" are equal to each other
+    # 1 if "s1" and "s2" are not equal to each other or not equal to "?"
+    ##
+    def dist(self, s1, s2):
+        if s1 == "?" and s2 == "?":
+            return 1
+        elif s1 == s2:
+            return 0
+        else:
+            return 1
