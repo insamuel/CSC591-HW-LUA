@@ -120,27 +120,38 @@ class Data:
     # the dist key and returns the sorted list.
     ##
     def around(self, row1, rows, cols):
+        return sorted(list(map(rows or self.rows, lambda row2: {"row": row2, "dist": self.dist(row1, row2, cols)})), key = lambda x: x["dist"])
+
+    ##
+    # Returns a tuple of two lists (left and right), two values (A and B)
+    # mid row, mid and a number c.
+    #
+    # Sets the value of rows to self.rows if rows is not provided.
+    # Calculates a sample of rows using the many function, and sets A to
+    # the first element of the sample or the value of above if provided. B
+    # is set to the row from self.around(A, some) that has the largest
+    # distance from A.
+    #
+    # Calculates the value of c as the distance between A and B, and
+    # initializes the lists left and right as empty.
+    #
+    # Sorts the rows by the result of the project function applied to each
+    # row and maps it to a list of dictionaries containing the row and its
+    # corresponding distance from A and B. The function then iterates over
+    # this sorted list, adds each row to either left or right based on its
+    # index, and sets mid to the row in the middle.
+    ##
+    def half(self, rows, cols, above):
+        def project(row):
+            return {"row": row, "dist": math.cos(dist(row, A), dist(row, B), c)}
+
+        def dist(row1, row2):
+            return self.dist(row1, row2, cols)
+
         if rows is None:
             rows = self.rows
 
-        distance_rows = []
+        some = many(rows, self.Sample)
 
-        ##
-        # Iterates through each row in the list rows. For each iteration of
-        # the loop, a tuple (row, self.dist(row1, row, cols)) is appended
-        # to the list distances.
-        #
-        # The self.dist(row1, row, cols) function call computes the
-        # distance between the current row and the row1 using the cols
-        # arguments.
-        #
-        # distance_rows list contain a list of tuples, each containing a
-        # row and its corresponding distance to row1.
-        ##
-        for row in rows:
-            distance_rows.append((row, self.dist(row1, row, cols)))
+        return left, right, A, B, mid, c
 
-        # x is the element and "dist" is the key in the list
-        key = lambda x: x["dist"]
-
-        return sorted(distance_rows, key)
