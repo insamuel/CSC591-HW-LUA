@@ -160,8 +160,9 @@ def csv(fname, fun=None):
     if fname is None or len(fname.strip()) == 0:
         raise Exception("File not found")
     else:
-        sep = Common.cfg['the']['separator']
-        with open(fname, 'r') as s:
+        sep = ","
+        file_path = my_path.parent.parent.parent / "etc" / fname
+        with open(file_path, 'r') as s:
             for s1 in s.readlines():
                 t = []
                 csv_row = s1.split(sep)             # Split a row using the separator, here ','
