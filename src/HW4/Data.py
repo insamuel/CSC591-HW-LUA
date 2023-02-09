@@ -1,3 +1,8 @@
+import numbers
+import yaml
+import math
+import Common
+
 import math
 import numbers
 import yaml
@@ -5,13 +10,11 @@ import yaml
 from pathlib import Path
 from Cols import Cols
 from Row import Row
-from Utils import csv, rnd
+from Utils import read_csv, rnd
 
 my_path = Path(__file__).resolve()  # resolve to get rid of any symlinks
 config_path = my_path.parent / 'config.yml'
 
-with config_path.open() as config_file:
-    cfg = yaml.safe_load(config_file)
 
 # Holds rows and their summaries in Cols.
 class Data:
@@ -19,20 +22,22 @@ class Data:
         self.cols = None  # Summaries of data
         self.rows = []  # Kept data
 
-        if type(src) == str:
-            csv(src, self.add)  # If string name do IO on csv file and send pass the add row func
+        if src:
+            read_csv(src, self.add)  # If string name do IO on csv file and send pass the add row func
         else:
             for _, row in src:  # Else given rows so no processing just add
                 self.add(row)
 
-    def add(self, t: Row):
+    def add(self, xs: Row):
 
         if not self.cols:
-            self.cols = Cols(t)
+            self.cols = Cols(xs)
         else:
-            t = t.cells if hasattr(t, "cells") else Row(t)
-            self.rows.append(t)
-            self.cols.add(t)
+            row = xs if type(xs) == Row else Row(xs)
+            self.rows.append(row)
+            for todo in [self.cols.x, self.cols.y]:
+                for col in todo:
+                    col.add(row.cells[col.col_position])
 
     def clone(self, init, x):
         data = Data({self.cols.names})

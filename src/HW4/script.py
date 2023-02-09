@@ -2,6 +2,11 @@ import yaml
 import Tests
 from Utils import cli
 
+import os
+
+SCRIPTDIR = os.path.dirname(__file__)
+YAMLFILE = os.path.join(SCRIPTDIR, 'config.yml')
+
 ##
 # Loads a YAML configuration file "config.yml" into a Python dictionary
 # "configs" using the yaml library.
@@ -28,31 +33,37 @@ from Utils import cli
 # The script allows the user to run a series of tests with
 # different options/arguments and store the configuration in a YAML file.
 ##
-with open("config.yml", "r") as config_file:
+with open(YAMLFILE, "r") as config_file:
     configs = yaml.safe_load(config_file)
 
-print("main.py : an example script with help text and a test suite\n")
-print("USAGE: main.py [OPTIONS] [-g ACTION] \n OPTIONS:\n"
-      " -d  --dump  on crash, dump stack = false \n"
-      " -g  --go    start-up action      = data\n"
-      " -h  --help  show help            = false\n" 
-      " -s  --seed  random number seed   = 937162211 \n"
-      " -q  --quit  exit \n")
+help_string = """USAGE: script.py [OPTIONS] [-g ACTION] \n OPTIONS:\n"
+      " -d  --dump      on crash, dump stack        = false \n"
+      "-f   --file      name of file                = ../../etc/data/auto93.cs\n"
+      "-F   --Far       distance to \"faraway\"     = .95"
+      "-g  --go         start-up action             = data\n"
+      "-h  --help       show help                   = false\n"
+      "-p  --p          distance coefficient        = 2\n"
+      "-m  --min        stop clusters at N^min = .5"
+      "-s  --seed       random number seed          = 937162211 \n"
+      "-q  --quit  exit \n"
+      "-S  --Sample  sampling data size             = 512\n"""
+
+print("script.py : an example script with help text and a test suite. Enter -h/--help for help.\n")
 
 run_csv = True
 
 while run_csv:
-    if configs['the']['help']:
-        print("Help \n USAGE EX: -s 456765 -g data \n OPTIONS:\n"
-              " -d  --dump  on crash, dump stack = false \n"
-              " -g  --go    start-up action      = data\n"
-              " -h  --help  show help            = false\n" 
-              " -s  --seed  random number seed   = 937162211 \n"
-              " -q  --quit  exit \n")
     csv_args = input("Select an option/s \n")
     new_configs = cli(csv_args, configs)
 
-    with open("config.yml", "w") as config_file:
+    with open(YAMLFILE, "w") as config_file:
         config_file.write(yaml.dump(new_configs))
 
-    Tests.ALL()
+    if new_configs['the']['help'] == True:
+        print(help_string)
+
+    if new_configs['the']['quit'] == True:
+        quit()
+
+    if new_configs['the']['go'] == True:
+        Tests.ALL()
