@@ -16,8 +16,8 @@ with config_path.open() as config_file:
 # Holds rows and their summaries in Cols.
 class Data:
     def __init__(self, src):
-        self.cols = None        # Summaries of data
-        self.rows = []          # Kept data
+        self.cols = None  # Summaries of data
+        self.rows = []  # Kept data
 
         if type(src) == str:
             csv(src, self.add)  # If string name do IO on csv file and send pass the add row func

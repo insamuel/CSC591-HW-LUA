@@ -16,8 +16,8 @@ with config_path.open() as config_file:
 # Holds rows and their summaries in Cols.
 class Data:
     def __init__(self, src):
-        self.cols = None        # Summaries of data
-        self.rows = []          # Kept data
+        self.cols = None  # Summaries of data
+        self.rows = []  # Kept data
 
         if type(src) == str:
             csv(src, self.add)  # If string name do IO on csv file and send pass the add row func
@@ -42,16 +42,16 @@ class Data:
     # Rounding numbers to 'places' (default=2)
     # For showCols, default = self.cols.y
     # No defaults for fun
-    def stats(self, places, showCols, fun):
-        if not showCols:
-            showCols = self.cols.y
+    def stats(self, what, cols, nplaces):
+        if not cols:
+            cols = self.cols.y
         t = {}
-        for col in showCols:
-            v = fun(col)
+        for col in cols:
+            v = what(col)
             if isinstance(v, numbers.Number):
-                t[col.col_name] = rnd(v, places)
+                t[col.txt] = rnd(v, nplaces)
             else:
-                t[col.col_name] = v
+                t[col.txt] = v
         return t
 
     ##

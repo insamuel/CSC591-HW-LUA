@@ -4,7 +4,7 @@ import Common
 from Num import Num
 from Sym import Sym
 from Data import Data
-from Utils import rnd, canPrint, rand, set_seed, csv
+from Utils import rnd, canPrint, rand, set_seed, csv, copy
 
 ##
 # Imports sys, TestEngine, Common, Num from Num, Sym from Sym, rnd,
@@ -170,6 +170,28 @@ def eg_stats():
     canPrint(data.stats(div, data.cols.x, 3), 'ydiv')
     return True
 
+@TestEngine.test
+def eg_copy():
+    t1 = {"a": 1, "b": {"c": 2, "d": [3]}}
+
+    t2 = copy(t1)
+
+    isequal = (t1 == t2)
+
+    t2["b"]["d"][0] = 10000
+
+    print("b4", t1, "\nafter", t2)
+    return isequal and t1 != t2
+
+@TestEngine.test
+def eg_position():
+    t=0
+    ##TODO
+
+
+@TestEngine.test
+def eg_every():
+    repgrid(Common.cfg['the']['file'])
 
 
 ##

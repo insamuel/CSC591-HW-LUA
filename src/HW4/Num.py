@@ -36,16 +36,16 @@ class Num:
     # is_sorted is set to True, indicating that the data has not been
     # updated since the last sort.
     ##
-    def __init__(self, col_position=0, col_name=""):
-        self.col_position   = col_position
-        self.col_name       = col_name
+    def __init__(self, at=0, txt=""):
+        self.at   = at
+        self.txt       = txt
         self.num_items      = 0         # items seen
         self.mu             = 0
         self.m2             = 0
         self.lo             = math.inf  # lowest seen
         self.hi             = -math.inf # highest seen
 
-        if self.col_name.find("-$") != -1:
+        if self.txt.find("-$") != -1:
             self.w = -1
         else:
             self.w = 1

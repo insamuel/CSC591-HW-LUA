@@ -1,3 +1,4 @@
+import copy as cp
 from subprocess import call
 import math
 import yaml
@@ -255,3 +256,6 @@ def cli(args, configs):
 ##
 def set_seed(x):
     configs['the']['seed'] = x
+
+def copy(t):
+    return cp.deepcopy(t)
