@@ -1,5 +1,8 @@
-import copy as cp
 from subprocess import call
+import os
+import csv
+
+import Common
 import math
 import yaml
 from pathlib import Path
@@ -93,6 +96,12 @@ def rand(lo, hi):
     configs['the']['seed'] = (16807 * configs['the']['seed']) % 2147483647
     return lo + (hi - lo) * configs['the']['seed'] / 2147483647
 
+def get_rand_items(list, item_count: int):
+    selected_items = []
+    for i in range(item_count):
+        selected_items.append(list[rand(i, len(list))])
+    return selected_items
+
 ##
 # Defines a function "rnd" that takes a floating point number x and an
 # argument places, which sets the number of decimal places for the rounded
@@ -142,6 +151,13 @@ def coerce(s):
     else:
         return None or fun(s)
 
+#find x,y from a line connecting `a` to `b`
+def cos(a, b, c):
+    x1 = (pow(a, 2) + pow(b, 2) + pow(c, 2)) / (2 * c)
+    x2 = max(0, min(1, x1))
+    y = pow(pow(a ^ 2) - pow(x2, 2), 0.5)
+    return {'x': x2, 'y': y}
+
 
 ##
 # Call "fun" on each row. Row cells are divided in "the.seperator"
@@ -157,21 +173,24 @@ def coerce(s):
 # Common.cfg['the']['separator']. The new line (\n) at the end of each row
 # is removed before typecasting the cells.
 ##
-def csv(fname, fun=None):
+def read_csv(fname, fun=None):
     if fname is None or len(fname.strip()) == 0:
         raise Exception("File not found")
     else:
-        sep = ","
-        file_path = my_path.parent.parent.parent / "etc" / fname
-        with open(file_path, 'r') as s:
-            for s1 in s.readlines():
-                t = []
-                csv_row = s1.split(sep)             # Split a row using the separator, here ','
-                csv_row[-1] = csv_row[-1][:-1]      # Removing \n from the end of last element
-                for cell in csv_row:
-                    t.append(coerce(cell))          # Every cell should be type casted
-                if fun:
-                    fun(t)
+
+        #try to catch relative paths
+        if not os.path.isfile(fname):
+            fname = os.path.join(os.path.dirname(__file__), fname)
+
+        fname = os.path.abspath(fname)
+
+        csv_list = []
+        with open(fname, 'r') as csv_file:
+            csv_list = list(csv.reader(csv_file, delimiter=','))
+        
+        if fun != None:
+            for item in csv_list:
+                fun(item)
 
 ##
 # Function that processes command line arguments passed to the script. The
@@ -184,67 +203,77 @@ def csv(fname, fun=None):
 def cli(args, configs):
     arg_arr = args.split(" ")
 
-    ##
-    # The input string of arguments is split into an array of strings called
-    # arg_arr. A variable run_tests is set to False and will be set to True
-    # if the argument "-e" is found in arg_arr.
-    ##
-    run_tests = False
+
     if '-e' in arg_arr:
-        run_tests = True
         arg_arr.remove("-e")
 
-    ##
-    # The function then loops through the arg_arr array with a step size of
-    # 2.
-    #
-    # If the current element in the loop is "-d", the next element is
-    # processed to set the 'dump' key in the configs dictionary.
-    #
-    # If the current element in the loop is "-g", the next element is
-    # processed to set the 'go' key in the configs dictionary.
-    #
-    # If the current element in the loop is "-h", the next element is
-    # processed to set the 'help' key in the configs dictionary.
-    #
-    # If the current element in the loop is "-s", the next element is
-    # processed as an integer to set the seed for the script.
-    #
-    # If the current element in the loop is "-q", the function prints
-    # "Exiting." and immediately exits the program.
-    ##
-    for x in range(0, len(arg_arr), 2):
-        if arg_arr[x] == "-d":
-            if arg_arr[x + 1] == 'True' or arg_arr[x + 1] == 'true':
-                configs['the']['dump'] = True
-            else:
-                configs['the']['dump'] = False
-            continue
-        elif arg_arr[x] == "-g":
-            configs['the']['go'] = str(arg_arr[x + 1])
-            continue
-        elif arg_arr[x] == "-h":
-            if arg_arr[x + 1] == 'True' or arg_arr[x + 1] == 'true':
-                configs['the']['help'] = True
-            else:
-                configs['the']['help'] = False
-            continue
-        elif arg_arr[x] == "-s":
-            set_seed(int(arg_arr[x + 1]))
-            continue
-        elif arg_arr[x] == "-q":
-            print("Exiting.")
-            exit()
-        else:
-            print(args[x], " is not a valid option. Exiting.")
-            exit()
 
-    ##
-    # If the run_tests flag was set to True, the function will call the
-    # script Tests.py.
-    ##
-    if run_tests:
-        call(["python", "/Tests.py"])
+    def find_arg_value(args: list[str], optionA: str, optionB: str) -> str:
+        index = args.index(optionA) if optionA in args else args.index(optionB)
+        if (index + 1) < len(args):
+            return args[index + 1]
+        return None
+
+    configs['the']['help'] = '-h' in args or '--help' in args
+    configs['the']['go'] = '-g' in args or '--go' in args
+    configs['the']['quit'] = '-q' in args or '--quit' in args
+    configs['the']['dump'] = '-d' in args or '--dump' in args
+    configs['the']['file'] = find_arg_value(args, '-f', '--file') if ('-f' in args or '--file' in args) else '../../etc/auto93.csv'
+   
+    #find the seed value
+    if '-s' in args or '--seed' in args:
+        seed_value = find_arg_value(args, '-s', '--seed')
+        if seed_value is not None:
+            try:
+                configs['the']['seed'] = int(seed_value)
+            except ValueError:
+                raise ValueError("Seed value must be an integer!")
+    else:
+        configs['the']['seed'] = 937162211
+
+    #find the far value
+    if '-f' in args or '--far' in args:
+        far_value = find_arg_value(args, '-f', '--far')
+        if far_value is not None:
+            try:
+                configs['the']['far'] = float(far_value)
+            except ValueError:
+                raise ValueError("Far value must be a float!")
+    else:
+        configs['the']['far'] = 0.95
+
+    #find the min value
+    if '-m' in args or '--min' in args:
+        min_value = find_arg_value(args, '-m', '--min')
+        if min_value is not None:
+            try:
+                configs['the']['min'] = float(min_value)
+            except ValueError:
+                raise ValueError("Min value must be a float!")
+    else:
+        configs['the']['min'] = 0.5
+
+    #find the p value
+    if '-p' in args or '--p' in args:
+        p_value = find_arg_value(args, '-p', '--p')
+        if p_value is not None:
+            try:
+                configs['the']['p'] = int(p_value)
+            except ValueError:
+                raise ValueError("P value must be an integer!")
+    else:
+        configs['the']['p'] = 2
+    
+    #find the sample value
+    if '-s' in args or '--sample' in args:
+        sample_value = find_arg_value(args, '-s', '--sample')
+        if sample_value is not None:
+            try:
+                configs['the']['sample'] = int(sample_value)
+            except ValueError:
+                raise ValueError("Sample value must be an integer!")
+    else:
+        configs['the']['sample'] = 512
 
     return configs
 
@@ -256,6 +285,3 @@ def cli(args, configs):
 ##
 def set_seed(x):
     configs['the']['seed'] = x
-
-def copy(t):
-    return cp.deepcopy(t)
