@@ -61,7 +61,7 @@ class Sym:
         # the count of the value in the dictionary self.has.
         ##
         if value != "?":
-            self.num_items += 1
+            self.n += 1
 
             if value in self.has:
                 self.has[value] += 1
@@ -122,7 +122,7 @@ class Sym:
             return p * math.log(p, 2)
 
         for num_items in self.has.values():
-            e = e + fun(num_items / self.num_items)
+            e = e + fun(num_items / self.n)
 
         return -e
 

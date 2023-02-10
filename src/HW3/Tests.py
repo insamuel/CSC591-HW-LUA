@@ -1,6 +1,7 @@
 import sys
 import TestEngine
 import Common
+from Data import Data
 from Num import Num
 from Sym import Sym
 from Utils import rnd, canPrint, rand, set_seed, csv
@@ -122,6 +123,54 @@ def eg_num():
     canPrint(results, 'Should be able to print mid and div')
 
     return 11/7 == mid and 0.787 == div
+
+
+
+@TestEngine.test
+def eg_data():
+    data = Data(Common.cfg['the']['file'])
+
+    return len(data.rows) == 398 and data.cols.y[0].w == -1 and data.cols.x[0].at == 0 and len(data.cols.x) == 4
+
+
+@TestEngine.test
+def eg_csv():
+    def fun(row):
+        fun.n += len(row)
+        if fun.n < 8 * 25:
+            canPrint(row, 'Should be able to print rows')
+
+    fun.n = 0
+    csv(Common.cfg['the']['file'], fun)
+    return fun.n == 8 * 399
+
+
+@TestEngine.test
+def eg_stats():
+    def div(col):
+        if type(col) == Num:
+            return Num.div(col)
+        else:
+            return Sym.div(col)
+
+    def mid(col):
+        if type(col) == Num:
+            return Num.mid(col)
+        else:
+            return Sym.mid(col)
+
+    data = Data(Common.cfg['the']['file'])
+    print('xmid', end='\t')
+    canPrint(data.stats(mid, data.cols.x, 2), 'xmid')
+    print('xdiv', end='\t')
+    canPrint(data.stats(div, data.cols.x, 3), 'xdiv')
+    print('ymid', end='\t')
+    canPrint(data.stats(mid, data.cols.y, 2), 'ymid')
+    print('ydiv', end='\t')
+    canPrint(data.stats(div, data.cols.x, 3), 'ydiv')
+    return True
+
+
 
 ##
 # Defines a function ALL using @TestEngine.test. This function calls other
