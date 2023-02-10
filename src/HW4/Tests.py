@@ -140,11 +140,38 @@ def eg_csv():
     read_csv(Common.cfg["the"]["file"], line_handler)
     return row_count == 399
 
-# @TestEngine
-# def eg_duplicate_structure():
-#     d = Data(Common.cfg['the']['file'])
+@TestEngine.test
+def eg_duplicate_structure():
+    d1 = Data(Common.cfg['the']['file'])
+    d2 = d1.clone()
+    return len(d1.rows) == len(d2.rows) and d1.cols.y[1].w == d2.cols.y[1].w and d1.cols.y[1].at == d2.cols.y[1].at
+
+@TestEngine.test 
+def test_data():
+    # i know this is horrible but it works
+    expected_output = '\ny\tmid\t{ :Lbs- 2970.42 :Acc+ 15.57 :Mpg+ 23.84}\n \tdiv\t{ :Lbs- 846.84 :Acc+ 2.76 :Mpg+ 8.34}\nx\tmid\t{ :Clndrs 5.45 :Volume 193.43 :Model 76.01 :origin 1}\n \tdiv\t{ :Clndrs 1.7 :Volume 104.27 :Model 3.7 :origin 1.3273558482394003}'
+    test_data = Data('../../etc/auto93.csv')
     
-    
+    y_mid_report = '{'
+    y_div_report = '{'
+    for y in test_data.cols.y:
+        y_mid_report = y_mid_report + ' :' + y.txt + ' ' + str(y.rnd(y.mid(), 2))
+        y_div_report = y_div_report + ' :' + y.txt + ' ' + str(y.rnd(y.div(), 2))
+    y_mid_report = y_mid_report + '}'
+    y_div_report = y_div_report + '}'
+
+    x_mid_report = '{'
+    x_div_report = '{'
+    for x in test_data.cols.x:
+        x_mid_report = x_mid_report + ' :' + x.txt + ' ' + str(x.rnd(x.mid(), 2))
+        x_div_report = x_div_report + ' :' + x.txt + ' ' + str(x.rnd(x.div(), 2))
+    x_mid_report = x_mid_report + '}'
+    x_div_report = x_div_report + '}'
+
+    res_string = '\ny\tmid\t' + y_mid_report + '\n \tdiv\t' + y_div_report + '\nx\tmid\t' + x_mid_report + '\n \tdiv\t' + x_div_report
+    print(res_string)
+    return res_string == expected_output
+
 
 ##
 # Defines a function ALL using @TestEngine.test. This function calls other

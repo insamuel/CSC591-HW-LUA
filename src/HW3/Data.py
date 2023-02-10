@@ -4,6 +4,7 @@ import math
 import Common
 import copy
 
+from typing import List
 from Cols import Cols
 from Row import Row
 from Utils import read_csv, rnd, get_rand_items, cos
@@ -15,41 +16,43 @@ with open("config.yml", 'r') as config_file:
 # Holds rows and their summaries in Cols.
 class Data:
     def __init__(self, src):
-        self.cols = None  # Summaries of data
-        self.rows = []  # Kept data
+        self.rows = []
+        self.cols =  None
         self.src = src
 
-        if src:
-            read_csv(src, self.add)  # If string name do IO on csv file and send pass the add row func
+        ## if the src is string then
+        ## it reads the file and then calls the add method to add each row
+        src_type = type(src)
+        if src_type == str :
+            read_csv(src, self.add)
+        elif src_type == List[str]: # else we were passed the columns as a string
+            self.add(src)
         else:
-            for _, row in src:  # Else given rows so no processing just add
-                self.add(row)
+            raise Exception("Unsupported type in Data constructor")
 
-    def add(self, xs: Row):
+    def add(self, xs: list[str]):
 
         if not self.cols:
             self.cols = Cols(xs)
         else:
-            row = xs if type(xs) == Row else Row(xs)
-            self.rows.append(row)
-            for todo in [self.cols.x, self.cols.y]:
-                for col in todo:
-                    col.add(row.cells[col.col_position])
+            new_row = Row(xs)
+            self.rows.append(new_row)
+            self.cols.add(new_row)
 
     # Rounding numbers to 'places' (default=2)
     # For showCols, default = self.cols.y
     # No defaults for fun
-    def stats(self, what, cols, nplaces):
-        if not cols:
-            cols = self.cols.y
-        t = {}
-        for col in cols:
-            v = what(col)
-            if isinstance(v, numbers.Number):
-                t[col.txt] = rnd(v, nplaces)
-            else:
-                t[col.txt] = v
-        return t
+    # def stats(self, places, showCols, fun):
+    #     if not showCols:
+    #         showCols = self.cols.y
+    #     t = {}
+    #     for col in showCols:
+    #         v = fun(col)
+    #         if isinstance(v, numbers.Number):
+    #             t[col.col_name] = rnd(v, places)
+    #         else:
+    #             t[col.col_name] = v
+    #     return t
 
     def clone(self):
         cloned_data = copy.deepcopy(self)
@@ -64,10 +67,10 @@ class Data:
     # Initialized several variables: s1 and s2 to 0, ys to i.cols
     # y, x and y to undefined.
     ##
-    def better(i, row1, row2):
+    def better(self, row1, row2):
         s1  = 0
         s2  = 0
-        ys  = i.cols.y
+        ys  = self.cols.y
         x, y
 
         ##

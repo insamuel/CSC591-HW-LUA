@@ -16,7 +16,7 @@ import math
 #
 # The "div" method returns the standard deviation.
 ##
-class Num:
+class Num():
     ##
     # Num summarizes a stream of numbers
     #
@@ -36,25 +36,25 @@ class Num:
     # is_sorted is set to True, indicating that the data has not been
     # updated since the last sort.
     ##
-    def __init__(self, at=0, txt=""):
-        self.at   = at
-        self.txt       = txt
-        self.num_items      = 0         # items seen
-        self.mu             = 0
-        self.m2             = 0
-        self.lo             = math.inf  # lowest seen
-        self.hi             = -math.inf # highest seen
+    def __init__(self, col_position=0, col_name=""):
+        self.at = col_position
+        self.txt = col_name
 
-        if self.txt.find("-$") != -1:
-            self.w = -1
-        else:
-            self.w = 1
+        self.n = 0
+        self.mu = 0
+        self.m2 = 0
+
+        self.lo = float('inf')
+        self.hi = float('-inf')
+
+        self.w = -1 if '-$' in col_name else 1
+
 
     ##
     # Reservoir sampler
     #
     # Defines the method named add that adds a float value n to the class.
-    # If n is not equal to the placeholder, '?', the method updates the
+    # If value is not equal to the placeholder, '?', the method updates the
     # values of the instance variables.
     #
     # num_items is incremented by 1 to represent an additional item seen.
@@ -75,14 +75,15 @@ class Num:
     # hi is updated to be the maximum between the current value of hi and
     # the new value n.
     ##
-    def add(self, n: float):
-        if n != '?':
-            self.num_items  += 1
-            d               = n - self.mu
-            self.mu         += (d / self.num_items)
-            self.m2         += d * (n - self.mu)
-            self.lo         = min(n, self.lo)
-            self.hi         = max(n, self.hi)
+    def add(self, value):
+        if value != '?':
+            float_value = float(value)
+            self.n = self.n + 1
+            d = float_value - self.mu
+            self.mu = self.mu + (d / self.n)
+            self.m2 = self.m2 + (d * (float_value - self.mu))
+            self.lo = min(float_value, self.lo)
+            self.hi = max(float_value, self.hi)
 
 
     ##
@@ -112,29 +113,31 @@ class Num:
     # - 1) using the math.pow function, and returns the result.
     ##
     def div(self):
-        return 0 if (self.m2 < 0 or self.num_items < 2) else math.pow((self.m2 / (self.num_items - 1)), 0.5)
+        if((self.m2 < 0) or (self.n < 2)):
+            return 0
+        return pow((self.m2 / (self.n - 1)), 0.5)
 
     ##
     # Checks if value is equal to "?". If it is, it returns value as is. If
     # not, it returns the rounded value to n decimal places using the
     # round function.
     ##
-    def rnd(self, value, n):
-        if value == "?":
-            return value
-        else:
-            return round(value, n)
+    def rnd(self, x, n):
+        if x == "?":
+            return x
+        mult = math.pow(10, n)
+        return math.floor(x*mult + 0.5) / mult
 
     ##
     # To normalize a numerical value "n" based on the "lo" and "hi" values
     # of an instance of the "NUM" class. We add "1E-32" to prevent a
     # division by zero.
     ##
-    def norm(i, n):
+    def norm(self, n):
         if n == "?":
             return n
         else:
-            return (n - i.lo) / (i.hi - i.lo + 1e-32)
+            return (n - self.lo) / (self.hi - self.lo + 1e-32)
 
     ##
     # Returns 1 if both n1 and n2 are equal to "?"
@@ -148,11 +151,11 @@ class Num:
     # Returns the absolute difference between the normalized values of n1
     # and n2 using the math.abs function.
     ##
-    def dist(i, n1, n2):
+    def dist(self, n1, n2):
         if n1 == "?" and n2 == "?":
             return 1
 
-        n1, n2 = i.norm(n1), i.norm(n2)
+        n1, n2 = self.norm(n1), self.norm(n2)
 
         if n1 == "?":
             n1 = 1 if n2 < 0.5 else 0

@@ -188,8 +188,9 @@ def read_csv(fname, fun=None):
         with open(fname, 'r') as csv_file:
             csv_list = list(csv.reader(csv_file, delimiter=','))
         
-        for item in csv_list:
-            fun(item)
+        if fun != None:
+            for item in csv_list:
+                fun(item)
 
 ##
 # Function that processes command line arguments passed to the script. The

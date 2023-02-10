@@ -1,6 +1,10 @@
-import re
-from Sym import Sym
 from Num import Num
+from Sym import Sym
+
+import Row
+
+import re
+from enum import Enum
 
 
 # Holds summaries of columns
@@ -21,28 +25,22 @@ class Cols:
     # x:        A list of independent columns.
     # y:        A list of dependent columns.
     ##
-    def __init__(self, names):
-        self.names = names  # All column names
-        self.all = []       # All columns including the skipped ones
-        self.klass = None   # The single dependent klass column (if it exists)
-        self.x = []         # Independent columns
-        self.y = []         # Dependent columns
+    def __init__(self, t: list[str]):
+        self.names = t
+        self.all = []
+        self.x = []
+        self.y = []
 
-        for c, s in enumerate(names):
-            # Generate Nums and Syms from col names
-            if re.match('^[A-Z]+', s):
-                col = Num(c, s)             # Numerics start with uppercase
-            else:
-                col = Sym(c, s)
-            self.all.append(col)
+        for n, s in enumerate(t):
+            if(s[-1].lower() != 'x'):
+                col = Num(n, s) if re.search("^[A-Z]+", s) != None else Sym(n, s)
+                self.all.append(col)
+                if re.search("X$", s) is None:
 
-            if not re.findall("X$", s):     # Some columns are skipped
-                if s[-1] in ['+', '-']:
-                    self.y.append(col)
-                else:
-                    self.x.append(col)
-                if s[-1] == '!':
-                    self.klass = col
+                    if(re.search("[!+-]$", s)):
+                        self.y.append(col)
+                    else:
+                        self.x.append(col)
 
     ##
     # The add method updates the dependent and independent columns with
@@ -50,9 +48,6 @@ class Cols:
     # lists and calling the add method for each column, passing in the
     # relevant cell from the row.cells list.
     ##
-    def add(self, row):
-        for _, names in enumerate([self.x, self.y]):
-            for _, col in enumerate(names):
-                col.add(row.cells[col.at])
-
-
+    def add(self, row: Row):
+        for col in self.all:
+            col.add(row.cells[col.at])
