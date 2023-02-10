@@ -1,43 +1,40 @@
-import math
 import numbers
 import yaml
+import math
+import Common
+import copy
 
-from pathlib import Path
 from Cols import Cols
 from Row import Row
-from Utils import csv, rnd
+from Utils import read_csv, rnd, get_rand_items, cos
 
-my_path = Path(__file__).resolve()  # resolve to get rid of any symlinks
-config_path = my_path.parent / 'config.yml'
-
-with config_path.open() as config_file:
+with open("config.yml", 'r') as config_file:
     cfg = yaml.safe_load(config_file)
+
 
 # Holds rows and their summaries in Cols.
 class Data:
     def __init__(self, src):
         self.cols = None  # Summaries of data
         self.rows = []  # Kept data
+        self.src = src
 
-        if type(src) == str:
-            csv(src, self.add)  # If string name do IO on csv file and send pass the add row func
+        if src:
+            read_csv(src, self.add)  # If string name do IO on csv file and send pass the add row func
         else:
             for _, row in src:  # Else given rows so no processing just add
                 self.add(row)
 
-    def add(self, t: Row):
+    def add(self, xs: Row):
 
         if not self.cols:
-            self.cols = Cols(t)
+            self.cols = Cols(xs)
         else:
-            t = t.cells if hasattr(t, "cells") else Row(t)
-            self.rows.append(t)
-            self.cols.add(t)
-
-    def clone(self, init, x):
-        data = Data({self.cols.names})
-        map(init or {}, data.add(x))
-        return data
+            row = xs if type(xs) == Row else Row(xs)
+            self.rows.append(row)
+            for todo in [self.cols.x, self.cols.y]:
+                for col in todo:
+                    col.add(row.cells[col.col_position])
 
     # Rounding numbers to 'places' (default=2)
     # For showCols, default = self.cols.y
@@ -54,18 +51,23 @@ class Data:
                 t[col.txt] = v
         return t
 
+    def clone(self):
+        cloned_data = copy.deepcopy(self)
+        return cloned_data
+        
+
     ##
     # Defines a function "better" determines if row1 dominates row2 based
     # on a comparison method called "Zitzler04". The function takes three
-    # arguments: self, row1, and row2.
+    # arguments: i, row1, and row2.
     #
-    # Initialized several variables: s1 and s2 to 0, ys to self.cols
+    # Initialized several variables: s1 and s2 to 0, ys to i.cols
     # y, x and y to undefined.
     ##
-    def better(self, row1, row2):
+    def better(i, row1, row2):
         s1  = 0
         s2  = 0
-        ys  = self.cols.y
+        ys  = i.cols.y
         x, y
 
         ##
@@ -80,8 +82,8 @@ class Data:
         # s2 by the number of elements in ys.
         ##
         for col in ys:
-            x = col.norm(row1.cells[col.col_position])
-            y = col.norm(row2.cells[col.col_position])
+            x = col.norm(row1.cells[col.at])
+            y = col.norm(row2.cells[col.at])
             s1 = s1 - math.exp(col.w * (x-y)/len(ys))
             s2 = s2 - math.exp(col.w * (y-x)/len(ys))
 
@@ -95,17 +97,31 @@ class Data:
     # row1.cells[col.at] and row2.cells[col.at] are the values in the
     # column col of row1 and row2 respectively.
     ##
-    def dist(self, row1, row2, cols, n = 0, d = 0):
+    def dist(self, row1: Row, row2: Row, cols: Cols, n = 0, d = 0):
         if cols is None:
             cols = self.cols.x
 
+        p =  Common.cfg['the']['p']
         for col in cols:
             n += 1
-            d += pow(col.dist(row1.cells[col.col_position], row2.cells[col.col_position]), self.p)
+            d += pow(col.dist(row1.cells[col.at], row2.cells[col.at]), p)
 
-        return pow(d / n, 1 / self.p)
+        return pow(d / n, 1 /  p)
 
-    ##
+    def around(self, rowA: Row, rows):
+        selected_rows = rows if rows != None else self.rows
+        def compare(rowB: Row, rowC: Row):
+            distAB = self.dist(rowA, rowB)
+            distAC = self.dist(rowA, rowC)
+            if(distAB < distAC):
+                return -1
+            elif(distAB > distAC):
+                return 1
+            return 0
+        selected_rows.sort(key=compare)
+        return selected_rows
+
+            ##
     # Sorts a list of rows based on their distance to a reference row, row1.
     # Sorting is performed in ascending order of the distance, so the
     # closest row will come first in the sorted list. The function takes
@@ -119,9 +135,12 @@ class Data:
     # arguments. Then, it sorts the list of dictionaries based on
     # the dist key and returns the sorted list.
     ##
-    def around(self, row1, rows, cols):
-        return sorted(list(map(rows or self.rows, lambda row2: {"row": row2, "dist": self.dist(row1, row2, cols)})), key = lambda x: x["dist"])
+    # def around(self, row1, rows, cols):
+    #     return sorted(list(map(rows or self.rows, lambda row2: {"row": row2, "dist": self.dist(row1, row2, cols)})), key = lambda x: x["dist"])
 
+    
+    
+    
     ##
     # Returns a tuple of two lists (left and right), two values (A and B)
     # mid row, mid and a number c.
@@ -141,17 +160,83 @@ class Data:
     # this sorted list, adds each row to either left or right based on its
     # index, and sets mid to the row in the middle.
     ##
-    def half(self, rows, cols, above):
-        def project(row):
-            return {"row": row, "dist": math.cos(dist(row, A), dist(row, B), c)}
+    def half(self, cols: Cols, above: Row, rows):
+        selected_rows = rows if rows != None else self.rows
+        sample = Common.cfg['the']['sample']
+        some = get_rand_items(selected_rows, sample)
 
-        def dist(row1, row2):
+        A = above if above != None else some[0] # Row A
+
+        far = Common.cfg['the']['far']
+        B_i = math.floor(far * len(rows))
+        B = self.around(A, some)[B_i] # Row B
+
+        c = self.dist(A, B)
+        
+        def distance(row1: Row, row2: Row):
             return self.dist(row1, row2, cols)
+        def project(row: Row):
+            return cos(self.dist(row, A), self.dist(row, B), c) #returns x,y values
 
-        if rows is None:
-            rows = self.rows
+        projections = []
+        for item in rows:
+            proj_result = project(item)
+            projections.append({'row': item, 'projection': proj_result})
 
-        some = many(rows, self.Sample)
+        def projection_sorter(projA, projB):
+            return projA.x - projB.x
+            
+        projections.sort(key=projection_sorter)
 
-        return left, right, A, B, mid, c
+        left = []
+        right = []
+        mid = {}
+        for i, item in projections:
+            if i < math.floor(len(rows) / 2):
+                left.append(item.row)
+                mid = item.row
+            else:
+                right.append(item.row)
 
+        return {
+                'left': left,
+                'right': right,
+                'A': A,
+                'B': B,
+                'mid': mid,
+                'c': c
+                }
+
+    
+    def cluster(self, rows, min, cols, above: Row):
+        selected_rows = rows if rows != None else self.rows
+        selected_min = min if min != None else math.pow(len(rows), Common.cfg['the']['min'])
+        selected_cols = cols if cols != None else self.cols.x
+        
+        if len(selected_rows) > (2 * selected_min):
+            node = self.half(selected_cols, above, selected_rows)
+            node.left = self.cluster(node.left, min, selected_cols, node.A)
+            node.right = self.cluster(node.right, min, selected_cols, node.B)
+        
+        node['data'] = copy.deepcopy(selected_rows)
+        return node
+
+    def sway(self, rows, min, cols, above):
+        selected_rows = rows if rows != None else self.rows
+        selected_min = min if min != None else math.pow(len(rows), Common.cfg['the']['min'])
+        selected_cols = cols if cols != None else self.cols.x
+
+        if len(selected_rows) > (2 * selected_min):
+            node = self.half(selected_cols, above, selected_rows)
+            node_copy = copy.deepcopy(node)
+            if self.better(node.B, node.A): 
+                node_copy.left = node.right
+                node_copy.right = node.left
+                node_copy.A = node.B
+                node_copy.B = node.A
+                node_copy.left = self.sway(node_copy.left, selected_min, selected_cols, node_copy.A)
+        node_copy['data'] = copy.deepcopy(selected_rows)
+        return node_copy
+            
+                
+        
