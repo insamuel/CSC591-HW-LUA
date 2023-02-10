@@ -141,17 +141,22 @@ class Data:
     # this sorted list, adds each row to either left or right based on its
     # index, and sets mid to the row in the middle.
     ##
-    def half(self, rows, cols, above):
-        def project(row):
-            return {"row": row, "dist": math.cos(dist(row, A), dist(row, B), c)}
+    # def half(self, rows, cols, above):
+    #     def project(row):
+    #         return {"row": row, "dist": math.cos(dist(row, A), dist(row, B), c)}
+    #
+    #     def dist(row1, row2):
+    #         return self.dist(row1, row2, cols)
+    #
+    #     if rows is None:
+    #         rows = self.rows
+    #
+    #     some = many(rows, self.Sample)
+    #
+    #     return left, right, A, B, mid, c
+    #
 
-        def dist(row1, row2):
-            return self.dist(row1, row2, cols)
-
-        if rows is None:
-            rows = self.rows
-
-        some = many(rows, self.Sample)
-
-        return left, right, A, B, mid, c
+    def furthest(self, row1):
+        t = self.around(row1, self.rows, self.cols)
+        return t[len(t)]
 
