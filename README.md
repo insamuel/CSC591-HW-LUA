@@ -18,6 +18,7 @@ Repository for all homeworks for CSC591.
 - To run HW2, navigate to \src\HW2 and run 'python main.py'. HW2 tests are contained in \src\HW2 and can be run all together by 'python Tests.py'. 
 
 - To run HW3, IN PROGRESS
+- To run HW4, IN PROGRESS
 
 
 
