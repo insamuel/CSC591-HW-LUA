@@ -32,6 +32,7 @@ class Sym:
     def __init__(self, at=0, txt=""):
         self.at = at
         self.txt = txt
+        
         self.n = 0
         self.has = {}
         self.most = 0
@@ -61,21 +62,21 @@ class Sym:
         # the count of the value in the dictionary self.has.
         ##
         if value != "?":
-            self.n += 1
+            if value != '?':
+                self.n = self.n + 1
+                if value in self.has:
+                    self.has[value] = self.has[value] + 1
+                else:
+                    self.has[value] = 1
+                ##
+                # Updates the values of self.most and self.mode if the count of value in
+                # self.has is greater than the current value of self.most. If this is the
+                # case, self.most is set to the count of value, and self.mode is set to value.
+                ##
+                if self.has[value] > self.most:
+                    self.most = self.has[value]
+                    self.mode = value
 
-            if value in self.has:
-                self.has[value] += 1
-            else:
-                self.has[value] = 1
-
-        ##
-        # Updates the values of self.most and self.mode if the count of value in
-        # self.has is greater than the current value of self.most. If this is the
-        # case, self.most is set to the count of value, and self.mode is set to value.
-        ##
-        if self.has[value] > self.most:
-            self.most = self.has[value]
-            self.mode = value
 
     ##
     # Calculates the mode, most common symbol
@@ -96,14 +97,7 @@ class Sym:
     # is returned as the result.
     ##
     def mid(self):
-        mode = None
-        most = -1
-        for key in self.has:
-            sym_count = self.has[key]
-            if sym_count > most:
-                most = sym_count
-                mode = key
-        return mode
+        return self.mode
 
     ##
     # Calculate diversity, which is entropy in the case of Sym
@@ -118,18 +112,16 @@ class Sym:
     # negative of the "e" value.
     ##
     def div(self, e = 0):
-        def fun(p):
-            return p * math.log(p, 2)
-
-        for num_items in self.has.values():
-            e = e + fun(num_items / self.n)
-
+        e = 0
+        for i in self.has:
+            p = self.has[i] / self.n
+            e = e + (p * math.log(p, 2))
         return -e
 
     ##
     # Returns `n` unchanged (SYMs do not get rounded)
     ##
-    def rnd(self, value, n):
+    def rnd(self, value):
         return value
 
     ##

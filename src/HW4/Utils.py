@@ -97,6 +97,12 @@ def rand(lo, hi):
     configs['the']['seed'] = (16807 * configs['the']['seed']) % 2147483647
     return lo + (hi - lo) * configs['the']['seed'] / 2147483647
 
+def get_rand_items(list, item_count: int):
+    selected_items = []
+    for i in range(item_count):
+        selected_items.append(list[rand(i, len(list))])
+    return selected_items
+
 ##
 # Defines a function "rnd" that takes a floating point number x and an
 # argument places, which sets the number of decimal places for the rounded
@@ -145,6 +151,13 @@ def coerce(s):
         return float(s)
     else:
         return None or fun(s)
+
+#find x,y from a line connecting `a` to `b`
+def cos(a, b, c):
+    x1 = (pow(a, 2) + pow(b, 2) + pow(c, 2)) / (2 * c)
+    x2 = max(0, min(1, x1))
+    y = pow(pow(a ^ 2) - pow(x2, 2), 0.5)
+    return {'x': x2, 'y': y}
 
 
 ##

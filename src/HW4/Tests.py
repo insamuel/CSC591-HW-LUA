@@ -140,9 +140,10 @@ def eg_csv():
     read_csv(Common.cfg["the"]["file"], line_handler)
     return row_count == 399
 
-@TestEngine
-def eg_duplicate_structure():
-    d = Data(Common.cfg['the']['file'])
+# @TestEngine
+# def eg_duplicate_structure():
+#     d = Data(Common.cfg['the']['file'])
+    
     
 
 ##
