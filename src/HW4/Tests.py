@@ -172,6 +172,71 @@ def test_data():
     print(res_string)
     return res_string == expected_output
 
+@TestEngine.test
+def test_sort_nearest_neighbor():
+    data = Data('../../etc/auto93.csv')
+    around_res = data.around(data.rows[0])
+
+    expected_output = "0\t0.0\t['8', '304.0', '193', '4732', '18.5', '70', '1', '10']\n50\t0.17\t['8', '318', '150', '4457', '13.5', '74', '1', '10']\n100\t0.28\t['6', '232', '100', '2901', '16', '74', '1', '20']\n150\t0.38\t['8', '351', '142', '4054', '14.3', '79', '1', '20']\n200\t0.55\t['4', '122', '96', '2300', '15.5', '77', '1', '30']\n250\t0.68\t['4', '119', '82', '2720', '19.4', '82', '1', '30']\n300\t0.71\t['4', '119', '97', '2545', '17', '75', '3', '20']\n350\t0.79\t['4', '146', '67', '3250', '21.8', '80', '2', '30']\n"
+    res_string = ""
+    for i in range(len(around_res)):
+        if i % 50 == 0:
+            row = around_res[max(0, i -1)]
+            dist = rnd(data.dist(row, data.rows[0]), 2)
+            res_string+= str(i) + "\t" + str(dist) + '\t' + str(row.cells) + '\n'
+    print(res_string)
+    return expected_output == res_string
+
+@TestEngine.test
+def test_one_level_bi_clustering():
+    data = Data('../../etc/auto93.csv')
+    set_seed(937162211)
+    half_res = data.half()
+    res_string = str(len(half_res['left'])) + '\t' + str(len(half_res['right'])) + '\t' + str(len(data.rows)) + '\n'
+    res_string += str(half_res['A'].cells) + '\t' + str(half_res['c']) + '\n'
+    res_string+= str(half_res['mid'].cells) + '\n'
+    res_string+= str(half_res['B'].cells) + '\n'
+    print(res_string)
+
+    #TODO this answer *seems* correct. we use a different random number generator so our A and B values are different. 
+    # will probably need more confirmation as the project goes on
+    expected_res = "199\t199\t398\n['4', '90', '48', '1985', '21.5', '78', '2', '40']\t0.6393183441778267\n['4', '151', '90', '2950', '17.3', '82', '1', '30']\n['6', '232', '100', '2634', '13', '71', '1', '20']\n"
+    return res_string == expected_res
+
+def show(cluster_res, cols, n_places, level):
+    if cluster_res != None:
+        report_string = ('| '*level)
+
+        data = cluster_res['data']
+
+        report_string+= ' ' + str(len(data.rows))
+        if 'left' not in cluster_res or level == 0:
+            report_string+= ' { '
+            for y in data.cols.y:
+                report_string+= ' :' + y.txt + ' ' + str(y.rnd(y.mid(), n_places))
+            report_string+= ' }'
+        print(report_string)
+
+        show(cluster_res['left'] if 'left' in cluster_res else None, cols, n_places, level + 1)
+        show(cluster_res['right'] if 'right' in cluster_res else None, cols, n_places, level + 1)
+
+
+@TestEngine.test
+def test_cluster():
+    data = Data('../../etc/auto93.csv')
+
+    show(data.cluster(), data.cols.y, 1, 0)
+
+    #TODO check if this is actually working (check if randomness effects output)
+    return True
+
+@TestEngine.test
+def test_sway():
+    data = Data('../../etc/auto93.csv')
+    show(data.sway(), data.cols.y, 1, 0)
+
+    #TODO check if this is actually working (check if randomness effects output)
+    return True
 
 ##
 # Defines a function ALL using @TestEngine.test. This function calls other

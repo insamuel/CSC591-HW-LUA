@@ -3,10 +3,10 @@ the:
   eg: ALL
   far: 0.95
   file: ../../etc/auto93.csv
-  go: true
+  go: false
   help: false
   min: 0.5
   p: 2
-  quit: false
+  quit: true
   sample: 512
   seed: 937162211

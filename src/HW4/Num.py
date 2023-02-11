@@ -137,7 +137,8 @@ class Num():
         if n == "?":
             return n
         else:
-            return (n - self.lo) / (self.hi - self.lo + 1e-32)
+            float_n = float(n)
+            return (float_n - self.lo) / (self.hi - (self.lo + 1e-32))
 
     ##
     # Returns 1 if both n1 and n2 are equal to "?"
