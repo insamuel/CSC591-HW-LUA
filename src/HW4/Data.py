@@ -3,6 +3,7 @@ import yaml
 import math
 import Common
 import copy
+import functools
 
 from typing import List
 from Cols import Cols
@@ -25,7 +26,7 @@ class Data:
         src_type = type(src)
         if src_type == str :
             read_csv(src, self.add)
-        elif src_type == List[str]: # else we were passed the columns as a string
+        elif src_type == list: # else we were passed the columns as a string
             self.add(src)
         else:
             raise Exception("Unsupported type in Data constructor")
@@ -54,9 +55,15 @@ class Data:
     #             t[col.col_name] = v
     #     return t
 
-    def clone(self):
-        cloned_data = copy.deepcopy(self)
-        return cloned_data
+    def clone(self, rows: list[str] = None):
+        if(rows == None):
+            return copy.deepcopy(self)
+        
+        new_data = Data(self.cols.names)
+        for item in rows:
+            new_data.add(item.cells)
+
+        return new_data
         
 
     ##
@@ -71,8 +78,7 @@ class Data:
         s1  = 0
         s2  = 0
         ys  = self.cols.y
-        x, y
-
+    
         ##
         # Calculates the values of x and y by calling the norm method on
         # each element of ys and passing the corresponding cell value from
@@ -87,10 +93,10 @@ class Data:
         for col in ys:
             x = col.norm(row1.cells[col.at])
             y = col.norm(row2.cells[col.at])
-            s1 = s1 - math.exp(col.w * (x-y)/len(ys))
-            s2 = s2 - math.exp(col.w * (y-x)/len(ys))
+            s1 = s1 - math.exp(col.w * ((x-y)/len(ys)))
+            s2 = s2 - math.exp(col.w * ((y-x)/len(ys)))
 
-        return s1/len(ys) < s2/len(ys)
+        return (s1/len(ys)) < (s2/len(ys))
 
     ##
     # Defines a function "dist" that calculates the distance between two
@@ -100,7 +106,7 @@ class Data:
     # row1.cells[col.at] and row2.cells[col.at] are the values in the
     # column col of row1 and row2 respectively.
     ##
-    def dist(self, row1: Row, row2: Row, cols: Cols, n = 0, d = 0):
+    def dist(self, row1: Row, row2: Row, cols: Cols = None, n = 0, d = 0):
         if cols is None:
             cols = self.cols.x
 
@@ -111,9 +117,9 @@ class Data:
 
         return pow(d / n, 1 /  p)
 
-    def around(self, rowA: Row, rows):
+    def around(self, rowA: Row, rows = None):
         selected_rows = rows if rows != None else self.rows
-        def compare(rowB: Row, rowC: Row):
+        def compare(rowB, rowC):
             distAB = self.dist(rowA, rowB)
             distAC = self.dist(rowA, rowC)
             if(distAB < distAC):
@@ -121,8 +127,8 @@ class Data:
             elif(distAB > distAC):
                 return 1
             return 0
-        selected_rows.sort(key=compare)
-        return selected_rows
+        sorted_rows = sorted(selected_rows, key = functools.cmp_to_key(compare))
+        return sorted_rows
 
             ##
     # Sorts a list of rows based on their distance to a reference row, row1.
@@ -163,7 +169,7 @@ class Data:
     # this sorted list, adds each row to either left or right based on its
     # index, and sets mid to the row in the middle.
     ##
-    def half(self, cols: Cols, above: Row, rows):
+    def half(self, cols: Cols = None, above: Row = None, rows = None):
         selected_rows = rows if rows != None else self.rows
         sample = Common.cfg['the']['sample']
         some = get_rand_items(selected_rows, sample)
@@ -171,35 +177,33 @@ class Data:
         A = above if above != None else some[0] # Row A
 
         far = Common.cfg['the']['far']
-        B_i = math.floor(far * len(rows))
+        B_i = math.floor(far * len(selected_rows))
         B = self.around(A, some)[B_i] # Row B
 
         c = self.dist(A, B)
         
-        def distance(row1: Row, row2: Row):
-            return self.dist(row1, row2, cols)
         def project(row: Row):
             return cos(self.dist(row, A), self.dist(row, B), c) #returns x,y values
 
         projections = []
-        for item in rows:
+        for item in selected_rows:
             proj_result = project(item)
             projections.append({'row': item, 'projection': proj_result})
 
         def projection_sorter(projA, projB):
-            return projA.x - projB.x
+            return projA['projection']['x'] -  projB['projection']['x']
             
-        projections.sort(key=projection_sorter)
+        sorted_projections = sorted(projections, key = functools.cmp_to_key(projection_sorter))
 
         left = []
         right = []
         mid = {}
-        for i, item in projections:
-            if i < math.floor(len(rows) / 2):
-                left.append(item.row)
-                mid = item.row
+        for i, item in enumerate(sorted_projections):
+            if i < math.floor(len(selected_rows) / 2):
+                left.append(item['row'])
+                mid = item['row']
             else:
-                right.append(item.row)
+                right.append(item['row'])
 
         return {
                 'left': left,
@@ -211,35 +215,41 @@ class Data:
                 }
 
     
-    def cluster(self, rows, min, cols, above: Row):
+    def cluster(self,rows = None, min = None, cols = None, above = None):
         selected_rows = rows if rows != None else self.rows
-        selected_min = min if min != None else math.pow(len(rows), Common.cfg['the']['min'])
+        selected_min = min if min != None else math.pow(len(selected_rows), Common.cfg['the']['min'])
         selected_cols = cols if cols != None else self.cols.x
         
+        node = {'data': self.clone(selected_rows)}
         if len(selected_rows) > (2 * selected_min):
-            node = self.half(selected_cols, above, selected_rows)
-            node.left = self.cluster(node.left, min, selected_cols, node.A)
-            node.right = self.cluster(node.right, min, selected_cols, node.B)
+            half_res = self.half(selected_cols, above, selected_rows)
+            node['A'] = half_res['A']
+            node['B'] = half_res['B']
+            node['mid'] = half_res['mid']
+            node['left'] = self.cluster(half_res['left'], selected_min, selected_cols, half_res['A'])
+            node['right'] = self.cluster(half_res['right'], selected_min, selected_cols, half_res['B'])
         
-        node['data'] = copy.deepcopy(selected_rows)
+        
         return node
 
-    def sway(self, rows, min, cols, above):
+    def sway(self, rows = None, min = None, cols = None, above = None):
         selected_rows = rows if rows != None else self.rows
-        selected_min = min if min != None else math.pow(len(rows), Common.cfg['the']['min'])
+        selected_min = min if min != None else math.pow(len(selected_rows), Common.cfg['the']['min'])
         selected_cols = cols if cols != None else self.cols.x
 
+        node = {'data': self.clone(selected_rows)}
         if len(selected_rows) > (2 * selected_min):
-            node = self.half(selected_cols, above, selected_rows)
-            node_copy = copy.deepcopy(node)
-            if self.better(node.B, node.A): 
-                node_copy.left = node.right
-                node_copy.right = node.left
-                node_copy.A = node.B
-                node_copy.B = node.A
-                node_copy.left = self.sway(node_copy.left, selected_min, selected_cols, node_copy.A)
-        node_copy['data'] = copy.deepcopy(selected_rows)
-        return node_copy
+            half_res = self.half(selected_cols, above, selected_rows)
+            left = half_res['left']
+            node['A'] = half_res['A']
+            node['B'] = half_res['B']
+            node['mid'] = half_res['mid']
+            if self.better(node['B'], node['A']): 
+                left = half_res['right']
+                node['A'] = half_res['B']
+                node['B'] = half_res['A']
+            node['left'] = self.sway(left, selected_min, selected_cols, node['A']) 
+        return node
             
                 
         
