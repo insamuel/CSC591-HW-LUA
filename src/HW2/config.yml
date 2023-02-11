@@ -1,7 +1,8 @@
 the:
-  dump: true
+  dump: false
   eg: ALL
-  go: data
-  help: true
+  file: ../../etc/data/auto93.csv
+  go: true
+  help: false
+  quit: false
   seed: 937162211
-  file: "auto93.csv"

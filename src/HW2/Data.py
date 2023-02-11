@@ -1,54 +1,41 @@
 import numbers
 import yaml
-from pathlib import Path
+import math
+import Common
+import copy
+import functools
+
+from typing import List
 from Cols import Cols
 from Row import Row
-from Utils import csv, rnd
+from Utils import read_csv
 
-my_path = Path(__file__).resolve()  # resolve to get rid of any symlinks
-config_path = my_path.parent / 'config.yml'
-
-with config_path.open() as config_file:
+with open("config.yml", 'r') as config_file:
     cfg = yaml.safe_load(config_file)
 
 
 # Holds rows and their summaries in Cols.
 class Data:
     def __init__(self, src):
-        self.cols = None  # Summaries of data
-        self.rows = []  # Kept data
+        self.rows = []
+        self.cols =  None
+        self.src = src
 
-        if type(src) == str:
-            csv(src, self.add)  # If string name do IO on csv file and send pass the add row func
+        ## if the src is string then
+        ## it reads the file and then calls the add method to add each row
+        src_type = type(src)
+        if src_type == str :
+            read_csv(src, self.add)
+        elif src_type == list: # else we were passed the columns as a string
+            self.add(src)
         else:
-            for _, row in src:  # Else given rows so no processing just add
-                self.add(row)
+            raise Exception("Unsupported type in Data constructor")
 
-    def add(self, t: Row):
+    def add(self, xs: list[str]):
 
         if not self.cols:
-            self.cols = Cols(t)
+            self.cols = Cols(xs)
         else:
-            t = t.cells if hasattr(t, "cells") else Row(t)
-            self.rows.append(t)
-            self.cols.add(t)
-
-    def clone(self, init, x):
-        data = Data({self.cols.names})
-        map(init or {}, data.add(x))
-        return data
-
-    # Rounding numbers to 'nplaces' (default=2)
-    # For cols, default = self.cols.y
-    # No defaults for what
-    def stats(self, what, cols, nplaces):
-        if not cols:
-            cols = self.cols.y
-        t = {}
-        for col in cols:
-            v = what(col)
-            if isinstance(v, numbers.Number):
-                t[col.txt] = rnd(v, nplaces)
-            else:
-                t[col.txt] = v
-        return t
+            new_row = Row(xs)
+            self.rows.append(new_row)
+            self.cols.add(new_row)

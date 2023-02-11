@@ -150,7 +150,7 @@ def eg_duplicate_structure():
 def test_data():
     # i know this is horrible but it works
     expected_output = '\ny\tmid\t{ :Lbs- 2970.42 :Acc+ 15.57 :Mpg+ 23.84}\n \tdiv\t{ :Lbs- 846.84 :Acc+ 2.76 :Mpg+ 8.34}\nx\tmid\t{ :Clndrs 5.45 :Volume 193.43 :Model 76.01 :origin 1}\n \tdiv\t{ :Clndrs 1.7 :Volume 104.27 :Model 3.7 :origin 1.3273558482394003}'
-    test_data = Data('../../etc/auto93.csv')
+    test_data = Data('../../etc/data/auto93.csv')
     
     y_mid_report = '{'
     y_div_report = '{'
@@ -174,7 +174,7 @@ def test_data():
 
 @TestEngine.test
 def test_sort_nearest_neighbor():
-    data = Data('../../etc/auto93.csv')
+    data = Data('../../etc/data/auto93.csv')
     around_res = data.around(data.rows[0])
 
     expected_output = "0\t0.0\t['8', '304.0', '193', '4732', '18.5', '70', '1', '10']\n50\t0.17\t['8', '318', '150', '4457', '13.5', '74', '1', '10']\n100\t0.28\t['6', '232', '100', '2901', '16', '74', '1', '20']\n150\t0.38\t['8', '351', '142', '4054', '14.3', '79', '1', '20']\n200\t0.55\t['4', '122', '96', '2300', '15.5', '77', '1', '30']\n250\t0.68\t['4', '119', '82', '2720', '19.4', '82', '1', '30']\n300\t0.71\t['4', '119', '97', '2545', '17', '75', '3', '20']\n350\t0.79\t['4', '146', '67', '3250', '21.8', '80', '2', '30']\n"
@@ -189,7 +189,7 @@ def test_sort_nearest_neighbor():
 
 @TestEngine.test
 def test_one_level_bi_clustering():
-    data = Data('../../etc/auto93.csv')
+    data = Data('../../etc/data/auto93.csv')
     set_seed(937162211)
     half_res = data.half()
     res_string = str(len(half_res['left'])) + '\t' + str(len(half_res['right'])) + '\t' + str(len(data.rows)) + '\n'
@@ -223,7 +223,7 @@ def show(cluster_res, cols, n_places, level):
 
 @TestEngine.test
 def test_cluster():
-    data = Data('../../etc/auto93.csv')
+    data = Data('../../etc/data/auto93.csv')
 
     show(data.cluster(), data.cols.y, 1, 0)
 
@@ -232,7 +232,7 @@ def test_cluster():
 
 @TestEngine.test
 def test_sway():
-    data = Data('../../etc/auto93.csv')
+    data = Data('../../etc/data/auto93.csv')
     show(data.sway(), data.cols.y, 1, 0)
 
     #TODO check if this is actually working (check if randomness effects output)
@@ -249,7 +249,7 @@ def test_sway():
 def ALL():
     for k in Common.eg:
         if k != "ALL":
-            print("\n−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−")
+            print('\n' + "---------------------------------------")
             if not TestEngine.runs(k):
                 Common.fails += 1
     return True

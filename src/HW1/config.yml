@@ -1,7 +1,8 @@
 the:
-  dump: true
+  dump: false
   eg: ALL
-  go: data
-  help: true
+  file: null
+  go: false
+  help: false
+  quit: true
   seed: 937162211
-  file:

@@ -2,11 +2,11 @@ the:
   dump: false
   eg: ALL
   far: 0.95
-  file: ../../etc/auto93.csv
-  go: false
+  file: ../../etc/data/auto93.csv
+  go: true
   help: false
   min: 0.5
   p: 2
-  quit: true
+  quit: false
   sample: 512
   seed: 937162211
