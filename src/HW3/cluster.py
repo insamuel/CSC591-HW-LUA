@@ -48,7 +48,7 @@ help_string = """USAGE: script.py [OPTIONS] [-g ACTION] \n OPTIONS:\n"
       "-q  --quit  exit \n"
       "-S  --Sample  sampling data size             = 512\n"""
 
-print("script.py : an example script with help text and a test suite. Enter -h/--help for help.\n")
+print("cluster.py : an example script with help text and a test suite. Enter -h/--help for help.\n")
 
 run_csv = True
 

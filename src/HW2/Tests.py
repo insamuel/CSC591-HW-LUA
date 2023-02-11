@@ -4,7 +4,8 @@ import TestEngine
 from Num import Num
 from Sym import Sym
 from Data import Data
-from Utils import rnd, canPrint, rand, set_seed, csv
+from Row import Row
+from Utils import rnd, canPrint, rand, set_seed, read_csv
 
 
 @TestEngine.test
@@ -71,40 +72,39 @@ def eg_data():
 
 @TestEngine.test
 def eg_csv():
-    def fun(row):
-        fun.n += len(row)
-        if fun.n < 8 * 25:
-            canPrint(row, 'Should be able to print rows')
-
-    fun.n = 0
-    csv(Common.cfg['the']['file'], fun)
-    return fun.n == 8 * 399
+    row_count = 0
+    def line_handler(xs: Row):
+        nonlocal row_count
+        row_count += 1
+    read_csv(Common.cfg["the"]["file"], line_handler)
+    return row_count == 399
 
 
 @TestEngine.test
 def eg_stats():
-    def div(col):
-        if type(col) == Num:
-            return Num.div(col)
-        else:
-            return Sym.div(col)
+       # i know this is horrible but it works
+    expected_output = '\ny\tmid\t{ :Lbs- 2970.42 :Acc+ 15.57 :Mpg+ 23.84}\n \tdiv\t{ :Lbs- 846.84 :Acc+ 2.76 :Mpg+ 8.34}\nx\tmid\t{ :Clndrs 5.45 :Volume 193.43 :Model 76.01 :origin 1}\n \tdiv\t{ :Clndrs 1.7 :Volume 104.27 :Model 3.7 :origin 1.3273558482394003}'
+    test_data = Data('../../etc/data/auto93.csv')
+    
+    y_mid_report = '{'
+    y_div_report = '{'
+    for y in test_data.cols.y:
+        y_mid_report = y_mid_report + ' :' + y.txt + ' ' + str(y.rnd(y.mid(), 2))
+        y_div_report = y_div_report + ' :' + y.txt + ' ' + str(y.rnd(y.div(), 2))
+    y_mid_report = y_mid_report + '}'
+    y_div_report = y_div_report + '}'
 
-    def mid(col):
-        if type(col) == Num:
-            return Num.mid(col)
-        else:
-            return Sym.mid(col)
+    x_mid_report = '{'
+    x_div_report = '{'
+    for x in test_data.cols.x:
+        x_mid_report = x_mid_report + ' :' + x.txt + ' ' + str(x.rnd(x.mid(), 2))
+        x_div_report = x_div_report + ' :' + x.txt + ' ' + str(x.rnd(x.div(), 2))
+    x_mid_report = x_mid_report + '}'
+    x_div_report = x_div_report + '}'
 
-    data = Data(Common.cfg['the']['file'])
-    print('xmid', end='\t')
-    canPrint(data.stats(mid, data.cols.x, 2), 'xmid')
-    print('xdiv', end='\t')
-    canPrint(data.stats(div, data.cols.x, 3), 'xdiv')
-    print('ymid', end='\t')
-    canPrint(data.stats(mid, data.cols.y, 2), 'ymid')
-    print('ydiv', end='\t')
-    canPrint(data.stats(div, data.cols.x, 3), 'ydiv')
-    return True
+    res_string = '\ny\tmid\t' + y_mid_report + '\n \tdiv\t' + y_div_report + '\nx\tmid\t' + x_mid_report + '\n \tdiv\t' + x_div_report
+    print(res_string)
+    return res_string == expected_output
 
 
 
@@ -112,7 +112,7 @@ def eg_stats():
 def ALL():
     for k in Common.eg:
         if k != "ALL":
-            print("\n−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−")
+            print('\n' + "---------------------------------------")
             if not TestEngine.runs(k):
                 Common.fails += 1
     return True

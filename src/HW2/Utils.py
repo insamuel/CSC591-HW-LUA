@@ -1,4 +1,9 @@
 from subprocess import call
+import os
+import csv
+import random
+
+import Common
 import math
 import yaml
 from pathlib import Path
@@ -72,62 +77,56 @@ def coerce(s):
 
 
 # Call "fun" on each row. Row cells are divided in "the.seperator"
-def csv(fname, fun=None):
+def read_csv(fname, fun=None):
     if fname is None or len(fname.strip()) == 0:
         raise Exception("File not found")
     else:
-        sep = ","
-        file_path = my_path.parent.parent.parent / "etc" / fname
-        with open(file_path, 'r') as s:
-            for s1 in s.readlines():
-                t = []
-                csv_row = s1.split(sep)  # Split a row using the separator, here ','
-                csv_row[-1] = csv_row[-1][:-1]  # Removing \n from the end of last element
-                for cell in csv_row:
-                    t.append(coerce(cell))          # Every cell should be type casted
-                if fun:
-                    fun(t)
+
+        #try to catch relative paths
+        if not os.path.isfile(fname):
+            fname = os.path.join(os.path.dirname(__file__), fname)
+
+        fname = os.path.abspath(fname)
+
+        csv_list = []
+        with open(fname, 'r') as csv_file:
+            csv_list = list(csv.reader(csv_file, delimiter=','))
+        
+        if fun != None:
+            for item in csv_list:
+                fun(item)
 
 
 def cli(args, configs):
     arg_arr = args.split(" ")
 
-    run_tests = False
+
     if '-e' in arg_arr:
-        run_tests = True
         arg_arr.remove("-e")
 
-    for x in range(0, len(arg_arr), 2):
-        if arg_arr[x] == "-d":
-            if arg_arr[x + 1] == 'True' or arg_arr[x + 1] == 'true':
-                configs['the']['dump'] = True
-            else:
-                configs['the']['dump'] = False
-            continue
-        elif arg_arr[x] == "-g":
-            configs['the']['go'] = str(arg_arr[x + 1])
-            continue
-        elif arg_arr[x] == "-f":
-            configs['the']['file'] = str(arg_arr[x + 1])
-            continue
-        elif arg_arr[x] == "-h":
-            if arg_arr[x + 1] == 'True' or arg_arr[x + 1] == 'true':
-                configs['the']['help'] = True
-            else:
-                configs['the']['help'] = False
-            continue
-        elif arg_arr[x] == "-s":
-            set_seed(int(arg_arr[x + 1]))
-            continue
-        elif arg_arr[x] == "-q":
-            print("Exiting.")
-            exit()
-        else:
-            print(args[x], " is not a valid option. Exiting.")
-            exit()
 
-    if run_tests:
-        call(["python", "/Tests.py"])
+    def find_arg_value(args: list[str], optionA: str, optionB: str) -> str:
+        index = args.index(optionA) if optionA in args else args.index(optionB)
+        if (index + 1) < len(args):
+            return args[index + 1]
+        return None
+
+    configs['the']['help'] = '-h' in args or '--help' in args
+    configs['the']['go'] = '-g' in args or '--go' in args
+    configs['the']['quit'] = '-q' in args or '--quit' in args
+    configs['the']['dump'] = '-d' in args or '--dump' in args
+    configs['the']['file'] = find_arg_value(args, '-f', '--file') if ('-f' in args or '--file' in args) else '../../etc/data/auto93.csv'
+   
+    #find the seed value
+    if '-s' in args or '--seed' in args:
+        seed_value = find_arg_value(args, '-s', '--seed')
+        if seed_value is not None:
+            try:
+                configs['the']['seed'] = int(seed_value)
+            except ValueError:
+                raise ValueError("Seed value must be an integer!")
+    else:
+        configs['the']['seed'] = 937162211
 
     return configs
 

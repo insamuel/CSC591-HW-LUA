@@ -66,7 +66,7 @@ def eg_num():
 def ALL():
     for k in Common.eg:
         if k != "ALL":
-            print("\n−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−−")
+            print("\n---------------------------------------")
             if not TestEngine.runs(k):
                 Common.fails += 1
     return True

@@ -217,7 +217,7 @@ def cli(args, configs):
     configs['the']['go'] = '-g' in args or '--go' in args
     configs['the']['quit'] = '-q' in args or '--quit' in args
     configs['the']['dump'] = '-d' in args or '--dump' in args
-    configs['the']['file'] = find_arg_value(args, '-f', '--file') if ('-f' in args or '--file' in args) else '../../etc/auto93.csv'
+    configs['the']['file'] = find_arg_value(args, '-f', '--file') if ('-f' in args or '--file' in args) else '../../etc/data/auto93.csv'
    
     #find the seed value
     if '-s' in args or '--seed' in args:

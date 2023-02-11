@@ -93,39 +93,31 @@ def csv(fname, fun=None):
 def cli(args, configs):
     arg_arr = args.split(" ")
 
-    run_tests = False
     if '-e' in arg_arr:
-        run_tests = True
         arg_arr.remove("-e")
 
-    for x in range(0, len(arg_arr), 2):
-        if arg_arr[x] == "-d":
-            if arg_arr[x + 1] == 'True' or arg_arr[x + 1] == 'true':
-                configs['the']['dump'] = True
-            else:
-                configs['the']['dump'] = False
-            continue
-        elif arg_arr[x] == "-g":
-            configs['the']['go'] = str(arg_arr[x + 1])
-            continue
-        elif arg_arr[x] == "-h":
-            if arg_arr[x + 1] == 'True' or arg_arr[x + 1] == 'true':
-                configs['the']['help'] = True
-            else:
-                configs['the']['help'] = False
-            continue
-        elif arg_arr[x] == "-s":
-            set_seed(int(arg_arr[x + 1]))
-            continue
-        elif arg_arr[x] == "-q":
-            print("Exiting.")
-            exit()
-        else:
-            print(args[x], " is not a valid option. Exiting.")
-            exit()
 
-    if run_tests:
-        call(["python", "/Tests.py"])
+    def find_arg_value(args: list[str], optionA: str, optionB: str) -> str:
+        index = args.index(optionA) if optionA in args else args.index(optionB)
+        if (index + 1) < len(args):
+            return args[index + 1]
+        return None
+
+    configs['the']['help'] = '-h' in args or '--help' in args
+    configs['the']['go'] = '-g' in args or '--go' in args
+    configs['the']['quit'] = '-q' in args or '--quit' in args
+    configs['the']['dump'] = '-d' in args or '--dump' in args
+   
+    #find the seed value
+    if '-s' in args or '--seed' in args:
+        seed_value = find_arg_value(args, '-s', '--seed')
+        if seed_value is not None:
+            try:
+                configs['the']['seed'] = int(seed_value)
+            except ValueError:
+                raise ValueError("Seed value must be an integer!")
+    else:
+        configs['the']['seed'] = 937162211
 
     return configs
 
