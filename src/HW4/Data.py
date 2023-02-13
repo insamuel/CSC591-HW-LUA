@@ -226,6 +226,7 @@ class Data:
             node['A'] = half_res['A']
             node['B'] = half_res['B']
             node['mid'] = half_res['mid']
+            node['c'] = half_res['c']
             node['left'] = self.cluster(half_res['left'], selected_min, selected_cols, half_res['A'])
             node['right'] = self.cluster(half_res['right'], selected_min, selected_cols, half_res['B'])
         
@@ -244,6 +245,7 @@ class Data:
             node['A'] = half_res['A']
             node['B'] = half_res['B']
             node['mid'] = half_res['mid']
+            node['c'] = half_res['c']
             if self.better(node['B'], node['A']): 
                 left = half_res['right']
                 node['A'] = half_res['B']

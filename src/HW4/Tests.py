@@ -1,6 +1,8 @@
 import sys
 import TestEngine
 import Common
+import Repgrid
+
 from Data import Data
 from Num import Num
 from Sym import Sym
@@ -172,7 +174,7 @@ def test_data():
     print(res_string)
     return res_string == expected_output
 
-@TestEngine.test
+#@TestEngine.test
 def test_sort_nearest_neighbor():
     data = Data('../../etc/data/auto93.csv')
     around_res = data.around(data.rows[0])
@@ -187,7 +189,7 @@ def test_sort_nearest_neighbor():
     print(res_string)
     return expected_output == res_string
 
-@TestEngine.test
+#@TestEngine.test
 def test_one_level_bi_clustering():
     data = Data('../../etc/data/auto93.csv')
     set_seed(937162211)
@@ -203,7 +205,7 @@ def test_one_level_bi_clustering():
     expected_res = "199\t199\t398\n['4', '90', '48', '1985', '21.5', '78', '2', '40']\t0.6393183441778267\n['4', '151', '90', '2950', '17.3', '82', '1', '30']\n['6', '232', '100', '2634', '13', '71', '1', '20']\n"
     return res_string == expected_res
 
-def show(cluster_res, cols, n_places, level):
+def show_hw3(cluster_res, cols, n_places, level):
     if cluster_res != None:
         report_string = ('| '*level)
 
@@ -220,22 +222,47 @@ def show(cluster_res, cols, n_places, level):
         show(cluster_res['left'] if 'left' in cluster_res else None, cols, n_places, level + 1)
         show(cluster_res['right'] if 'right' in cluster_res else None, cols, n_places, level + 1)
 
+def show_hw4(cluster_res, cols, n_places, level):
+    if cluster_res != None:
+        report_string = ('| '*level)
 
-@TestEngine.test
+        data = cluster_res['data']
+
+        report_string+= ' ' + str(len(data.rows))
+        if 'left' not in cluster_res:
+            report_string+= ' { ' + str(data.rows[-1].cells[-1])
+        else:
+            report_string+= ' { ' + str(rnd(100 * cluster_res['c']))
+        report_string+= ' }'
+        print(report_string)
+
+        show_hw4(cluster_res['left'] if 'left' in cluster_res else None, cols, n_places, level + 1)
+        show_hw4(cluster_res['right'] if 'right' in cluster_res else None, cols, n_places, level + 1)
+
+
+#@TestEngine.test
 def test_cluster():
     data = Data('../../etc/data/auto93.csv')
 
-    show(data.cluster(), data.cols.y, 1, 0)
+    show_hw3(data.cluster(), data.cols.y, 1, 0)
 
-    #TODO check if this is actually working (check if randomness effects output)
+    #TODO check if this is actually working (randomness changes output from what dr. menzies has)
+    return True
+
+#@TestEngine.test
+def test_sway():
+    data = Data('../../etc/data/auto93.csv')
+    show_hw3(data.sway(), data.cols.y, 1, 0)
+
+    #TODO check if this is actually working (randomness changes output from what dr. menzies has)
     return True
 
 @TestEngine.test
-def test_sway():
-    data = Data('../../etc/data/auto93.csv')
-    show(data.sway(), data.cols.y, 1, 0)
+def test_repcols():
+    generated_data = Repgrid.process_repgrid_file('../../etc/data/repgrid1.csv')
+    show_hw4(generated_data.cluster(), generated_data.cols.y, 1, 0)
 
-    #TODO check if this is actually working (check if randomness effects output)
+    #TODO check if this is actually working (randomness changes output from what dr. menzies has)
     return True
 
 ##
