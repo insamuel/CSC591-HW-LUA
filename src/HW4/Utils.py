@@ -152,6 +152,7 @@ def coerce(s):
 
 #find x,y from a line connecting `a` to `b`
 def cos(a, b, c):
+    c = max(c, 1)
     x1 = (pow(a, 2) + pow(b, 2) + pow(c, 2)) / (2 * c)
     x2 = max(0, min(1, x1))
     y = pow((pow(a, 2) - pow(x2, 2)), 0.5)

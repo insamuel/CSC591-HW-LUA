@@ -36,7 +36,7 @@ YAMLFILE = os.path.join(SCRIPTDIR, 'config.yml')
 with open(YAMLFILE, "r") as config_file:
     configs = yaml.safe_load(config_file)
 
-help_string = """USAGE: script.py [OPTIONS] [-g ACTION] \n OPTIONS:\n"
+help_string = """USAGE: grid.py [OPTIONS] [-g ACTION] \n OPTIONS:\n"
       " -d  --dump      on crash, dump stack        = false \n"
       "-f   --file      name of file                = ../../etc/data/auto93.cs\n"
       "-F   --Far       distance to \"faraway\"     = .95"
