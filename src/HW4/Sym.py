@@ -121,3 +121,8 @@ class Sym():
             return 0
         else:
             return 1
+
+    def to_string(self) -> str:
+        #+ ', has: ' + str(self.has) +
+        summary = '{SYM, at: ' + str(self.at) + ', most: ' + str(self.most) + ', n: ' + str(self.n) + ', txt: ' + self.txt + '}'
+        return summary

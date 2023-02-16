@@ -164,3 +164,7 @@ class Num():
             n2 = 1 if n1 < 0.5 else 0
 
         return abs(n1 - n2)
+
+    def to_string(self) -> str:
+        summary = '{NUM, at: ' + str(self.at) + ', hi: ' + str(self.hi) + ', lo: ' + str(self.lo) + ', m2: ' + str(self.m2) + ', mu: ' + str(self.mu) + ', n: ' + str(self.n) + ', txt: ' + self.txt + '}'
+        return summary
