@@ -4,11 +4,12 @@ import math
 import Common
 import copy
 import functools
+import random
 
 from typing import List
 from Cols import Cols
 from Row import Row
-from Utils import read_csv, rnd, get_rand_items, cos
+from Utils import read_csv, rand, get_rand_items, cos
 
 with open("config.yml", 'r') as config_file:
     cfg = yaml.safe_load(config_file)
@@ -119,35 +120,17 @@ class Data:
 
     def around(self, rowA: Row, rows = None):
         selected_rows = rows if rows != None else self.rows
-        def compare(rowB, rowC):
-            distAB = self.dist(rowA, rowB)
-            distAC = self.dist(rowA, rowC)
-            if(distAB < distAC):
-                return -1
-            elif(distAB > distAC):
-                return 1
-            return 0
-        sorted_rows = sorted(selected_rows, key = functools.cmp_to_key(compare))
-        return sorted_rows
+        def distance(rowB):
+            return {"row": rowB, "dist": self.dist(rowA, rowB, None)}
 
-            ##
-    # Sorts a list of rows based on their distance to a reference row, row1.
-    # Sorting is performed in ascending order of the distance, so the
-    # closest row will come first in the sorted list. The function takes
-    # four arguments: self, row1, rows, and cols.
-    #
-    # If the rows argument is None, the function sets rows to self.rows.
-    #
-    # Maps the rows list to a list of dictionaries. Each dictionary
-    # contains the row and its dist to the row1. The dist is calculated
-    # using the self.dist method and passing it row1, row2, and cols as
-    # arguments. Then, it sorts the list of dictionaries based on
-    # the dist key and returns the sorted list.
-    ##
-    # def around(self, row1, rows, cols):
-    #     return sorted(list(map(rows or self.rows, lambda row2: {"row": row2, "dist": self.dist(row1, row2, cols)})), key = lambda x: x["dist"])
+        sorted_rows = sorted(list(map(distance, selected_rows)), key=lambda x: x["dist"])
 
-    
+        return [ sub['row'] for sub in sorted_rows]
+
+
+    def furthest(self, rowA, rows):
+        t = self.around(rowA, rows)
+        return t[-1]
     
     
     ##
@@ -171,35 +154,38 @@ class Data:
     ##
     def half(self, cols: Cols = None, above: Row = None, rows = None):
         selected_rows = rows if rows != None else self.rows
-        sample = Common.cfg['the']['sample']
-        some = get_rand_items(selected_rows, sample)
+        
+        index = rand(0, len(selected_rows))
+        A = above if above != None else selected_rows[index] # Row A
 
-        A = above if above != None else some[0] # Row A
+        B = self.furthest(A, selected_rows)
 
-        far = Common.cfg['the']['far']
-        B_i = math.floor(far * len(selected_rows))
-        B = self.around(A, some)[B_i] # Row B
-
-        c = self.dist(A, B)
+        c = self.dist(A, B, cols)
         
         def project(row: Row):
-            return cos(self.dist(row, A), self.dist(row, B), c) #returns x,y values
+            projection = cos(self.dist(row, A, cols), self.dist(row, B, cols), c)
+            row.x = float(projection['x'])
+            row.y = float(projection['y'])
+            projection["row"] = row
+            return projection
 
-        projections = []
-        for item in selected_rows:
-            proj_result = project(item)
-            projections.append({'row': item, 'projection': proj_result})
 
-        def projection_sorter(projA, projB):
-            return projA['projection']['x'] -  projB['projection']['x']
+        # projections = []
+        # for item in selected_rows:
+        #     proj_result = project(item)
+        #     projections.append({'row': item, 'projection': proj_result})
+
+        # def projection_sorter(projA, projB):
+        #     return projA['projection']['x'] -  projB['projection']['x']
             
-        sorted_projections = sorted(projections, key = functools.cmp_to_key(projection_sorter))
+        # sorted_projections = sorted(projections, key = functools.cmp_to_key(projection_sorter))
+        sorted_projections = sorted(list(map(project, selected_rows)), key=lambda x: x["x"])
 
         left = []
         right = []
         mid = {}
         for i, item in enumerate(sorted_projections):
-            if i < math.floor(len(selected_rows) / 2):
+            if i < len(selected_rows) / 2:
                 left.append(item['row'])
                 mid = item['row']
             else:
@@ -215,20 +201,19 @@ class Data:
                 }
 
     
-    def cluster(self,rows = None, min = None, cols = None, above = None):
+    def cluster(self,rows = None, cols = None, above = None):
         selected_rows = rows if rows != None else self.rows
-        selected_min = min if min != None else math.pow(len(selected_rows), Common.cfg['the']['min'])
         selected_cols = cols if cols != None else self.cols.x
         
         node = {'data': self.clone(selected_rows)}
-        if len(selected_rows) > (2 * selected_min):
+        if len(selected_rows) >= 2:
             half_res = self.half(selected_cols, above, selected_rows)
             node['A'] = half_res['A']
             node['B'] = half_res['B']
             node['mid'] = half_res['mid']
             node['c'] = half_res['c']
-            node['left'] = self.cluster(half_res['left'], selected_min, selected_cols, half_res['A'])
-            node['right'] = self.cluster(half_res['right'], selected_min, selected_cols, half_res['B'])
+            node['left'] = self.cluster(half_res['left'], selected_cols, half_res['A'])
+            node['right'] = self.cluster(half_res['right'], selected_cols, half_res['B'])
         
         
         return node

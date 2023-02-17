@@ -99,7 +99,7 @@ def rand(lo = None, hi = None):
     return rand.randrange(lo, hi)
 
 def get_rand_items(list, item_count: int):
-    return random.choices(list, k=item_count)
+    return random.sample(list, item_count)
 
 ##
 # Defines a function "rnd" that takes a floating point number x and an
@@ -152,10 +152,10 @@ def coerce(s):
 
 #find x,y from a line connecting `a` to `b`
 def cos(a, b, c):
-    c = max(c, 1)
-    x1 = (pow(a, 2) + pow(b, 2) + pow(c, 2)) / (2 * c)
+    denominator = 1 if c == 0 else 2 * c
+    x1 = (pow(a, 2) + pow(b, 2) - pow(c, 2)) / denominator
     x2 = max(0, min(1, x1))
-    y = pow((pow(a, 2) - pow(x2, 2)), 0.5)
+    y = pow(abs((pow(a, 2) - pow(x2, 2))), 0.5)
     return {'x': x2, 'y': y}
 
 
