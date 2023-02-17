@@ -187,7 +187,7 @@ def read_csv(fname, fun=None):
         csv_list = []
         with open(fname, 'r') as csv_file:
             csv_list = list(csv.reader(csv_file, delimiter=','))
-        
+
         if fun != None:
             for item in csv_list:
                 fun(item)
@@ -214,24 +214,43 @@ def cli(args, configs):
             return args[index + 1]
         return None
 
-    configs['the']['help'] = '-h' in args or '--help' in args
-    configs['the']['go'] = '-g' in args or '--go' in args
     configs['the']['quit'] = '-q' in args or '--quit' in args
     configs['the']['dump'] = '-d' in args or '--dump' in args
-    configs['the']['file'] = find_arg_value(args, '-f', '--file') if ('-f' in args or '--file' in args) else '../../etc/data/auto93.csv'
-   
-    #find the seed value
-    if '-s' in args or '--seed' in args:
-        seed_value = find_arg_value(args, '-s', '--seed')
-        if seed_value is not None:
-            try:
-                configs['the']['seed'] = int(seed_value)
-            except ValueError:
-                raise ValueError("Seed value must be an integer!")
-    else:
-        configs['the']['seed'] = 937162211
 
-    #find the far value
+    ##
+    # Initial number of bins
+    ##
+    if '-b' in args or '--bins' in args:
+        bin_value = find_arg_value(args, '-b', '--bins')
+        if bin_value is not None:
+            try:
+                configs['the']['bins'] = int(bin_value)
+            except ValueError:
+                raise ValueError("Bin value must be an integer!")
+    else:
+        configs['the']['bins'] = 16
+
+    ##
+    # Cliff's delta threshold
+    ##
+    if '-c' in args or '--cliffs' in args:
+        cliff_value = find_arg_value(args, '-c', '--cliffs')
+        if cliff_value is not None:
+            try:
+                configs['the']['cliffs'] = float(cliff_value)
+            except ValueError:
+                raise ValueError("Cliff value must be a float!")
+    else:
+        configs['the']['cliff'] = .147
+
+    ##
+    # Data file
+    ##
+    configs['the']['file'] = find_arg_value(args, '-f', '--file') if ('-f' in args or '--file' in args) else '../../etc/data/auto93.csv'
+
+    ##
+    # Find the far value
+    ##
     if '-f' in args or '--far' in args:
         far_value = find_arg_value(args, '-f', '--far')
         if far_value is not None:
@@ -242,7 +261,32 @@ def cli(args, configs):
     else:
         configs['the']['far'] = 0.95
 
-    #find the min value
+    ##
+    # Start-up action
+    ##
+    configs['the']['go'] = '-g' in args or '--go' in args
+
+    ##
+    # Show help
+    ##
+    configs['the']['help'] = '-h' in args or '--help' in args
+
+    ##
+    # Search space for clustering
+    ##
+    if '-H' in args or '--Halves' in args:
+        halves_value = find_arg_value(args, '-H', '--Halves')
+        if halves_value is not None:
+            try:
+                configs['the']['Halves'] = int(halves_value)
+            except ValueError:
+                raise ValueError("Halves value must be an integer!")
+    else:
+        configs['the']['Halves'] = 512
+
+    ##
+    # Size of smallest cluster
+    ##
     if '-m' in args or '--min' in args:
         min_value = find_arg_value(args, '-m', '--min')
         if min_value is not None:
@@ -253,7 +297,22 @@ def cli(args, configs):
     else:
         configs['the']['min'] = 0.5
 
-    #find the p value
+    ##
+    # Max numbers
+    ##
+    if '-M' in args or '--Max' in args:
+        max_value = find_arg_value(args, '-H', '--Halves')
+        if halves_value is not None:
+            try:
+                configs['the']['Max'] = int(max_value)
+            except ValueError:
+                raise ValueError("Max value must be an integer!")
+    else:
+        configs['the']['Max'] = 512
+
+    ##
+    # dist coefficient
+    ##
     if '-p' in args or '--p' in args:
         p_value = find_arg_value(args, '-p', '--p')
         if p_value is not None:
@@ -263,17 +322,45 @@ def cli(args, configs):
                 raise ValueError("P value must be an integer!")
     else:
         configs['the']['p'] = 2
-    
-    #find the sample value
-    if '-s' in args or '--sample' in args:
-        sample_value = find_arg_value(args, '-s', '--sample')
-        if sample_value is not None:
+
+    ##
+    # How many of rest to sample
+    ##
+    if '-r' in args or '--rest' in args:
+        rest_value = find_arg_value(args, '-r', '--rest')
+        if rest_value is not None:
             try:
-                configs['the']['sample'] = int(sample_value)
+                configs['the']['rest'] = int(rest_value)
             except ValueError:
-                raise ValueError("Sample value must be an integer!")
+                raise ValueError("Rest value must be an integer!")
     else:
-        configs['the']['sample'] = 512
+        configs['the']['rest'] = 4
+
+    ##
+    # Child splits reuse a parent pole
+    ##
+    if '-R' in args or '--Reuse' in args:
+        reuse_value = find_arg_value(args, '-R', '--Reuse')
+        if reuse_value is not None:
+            try:
+                configs['the']['Reuse'] = int(reuse_value)
+            except ValueError:
+                raise ValueError("Rest value must be an integer!")
+    else:
+        configs['the']['Reuse'] = True
+
+    ##
+    # Random number seed
+    ##
+    if '-s' in args or '--seed' in args:
+        seed_value = find_arg_value(args, '-s', '--seed')
+        if seed_value is not None:
+            try:
+                configs['the']['seed'] = int(seed_value)
+            except ValueError:
+                raise ValueError("Seed value must be an integer!")
+    else:
+        configs['the']['seed'] = 937162211
 
     return configs
 
