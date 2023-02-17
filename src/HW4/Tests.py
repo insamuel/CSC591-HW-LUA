@@ -242,7 +242,20 @@ def test_repplace():
 
     return True
 
-@TestEngine.test
+#@TestEngine.test
+def test_around():
+    generated_data = Repgrid.reprows('../../etc/data/repgrid1.csv')
+    around_res = generated_data.around(generated_data.rows[-1])
+
+    res_string = ""
+    for i in range(len(around_res)):
+        row = around_res[max(0, i -1)]
+        dist = rnd(generated_data.dist(row, generated_data.rows[-1]), 2)
+        res_string+= str(i) + "\t" + str(dist) + '\t' + str(row.cells) + '\n'
+    print(res_string)
+
+
+#@TestEngine.test
 def test_all():
     rep_rows = Repgrid.reprows('../../etc/data/repgrid1.csv')
     rep_cols = Repgrid.repcols('../../etc/data/repgrid1.csv')

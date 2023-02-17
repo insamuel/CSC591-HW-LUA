@@ -153,7 +153,7 @@ def coerce(s):
 #find x,y from a line connecting `a` to `b`
 def cos(a, b, c):
     denominator = 1 if c == 0 else 2 * c
-    x1 = (pow(a, 2) + pow(b, 2) - pow(c, 2)) / denominator
+    x1 = (pow(a, 2) + pow(c, 2) - pow(b, 2)) / denominator
     x2 = max(0, min(1, x1))
     y = pow(abs((pow(a, 2) - pow(x2, 2))), 0.5)
     return {'x': x2, 'y': y}
