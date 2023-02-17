@@ -118,7 +118,7 @@ class Data:
 
         return pow(d / n, 1 /  p)
 
-    def around(self, rowA: Row, rows = None):
+    def around(self, rowA: Row, rows = None, cols = None):
         selected_rows = rows if rows != None else self.rows
         def distance(rowB):
             return {"row": rowB, "dist": self.dist(rowA, rowB, None)}
@@ -164,21 +164,11 @@ class Data:
         
         def project(row: Row):
             projection = cos(self.dist(row, A, cols), self.dist(row, B, cols), c)
-            row.x = float(projection['x'])
-            row.y = float(projection['y'])
+            row.x = row.x if row.x != None else float(projection['x'])
+            row.y = row.y if row.y != None else float(projection['y'])
             projection["row"] = row
             return projection
 
-
-        # projections = []
-        # for item in selected_rows:
-        #     proj_result = project(item)
-        #     projections.append({'row': item, 'projection': proj_result})
-
-        # def projection_sorter(projA, projB):
-        #     return projA['projection']['x'] -  projB['projection']['x']
-            
-        # sorted_projections = sorted(projections, key = functools.cmp_to_key(projection_sorter))
         sorted_projections = sorted(list(map(project, selected_rows)), key=lambda x: x["x"])
 
         left = []
