@@ -16,13 +16,15 @@ The first person we interviewed mentioned these ten games:
 
 Each following interviewee were asked about the same ten games. However, the attributes used to describe them were left to the individual to come up with. 
 
-The results of each interview can be found in etc/out/hw4_repgrid. 
+The results of each interview can be found [here](https://github.com/insamuel/CSC591-HW-LUA/tree/hw4_writeup/etc/out/hw4_interview_output).
 
 Some of the common types of attributes selected by the interviewees to describe these games were:
 
-1.	Adjectives that described how polished/free of bugs a game was.
-2.	A game’s look or feel.
-3.	The perceived quality of a game’s story and/or characters.
+- Adjectives that described how polished/free of bugs a game was.
+- A game’s look or feel.
+- The perceived quality of a game’s story and/or characters.
 
 In each interview’s reprows results, games (examples) that had similar attribute ratings were grouped together. For example, in 2/3 of our results, Splatoon 2 and Splatoon 3 were clustered together since the interviewees rated them similarly. 
+
+
 Attributes that were similar were also generally grouped together in each set of results (repcols results). For example, the “Buggy-ness” attribute of a game was grouped with the “Good graphics vs. Bad graphics” or “Unresponsive vs Responsive controls” attributes. 
