@@ -1,11 +1,29 @@
 import yaml
 import Tests
+
 from Utils import cli
+import Repgrid
 
 import os
 
 SCRIPTDIR = os.path.dirname(__file__)
 YAMLFILE = os.path.join(SCRIPTDIR, 'config.yml')
+
+def run_repgrid(filepath: str):
+    rep_rows = Repgrid.reprows(filepath)
+    rep_cols = Repgrid.repcols(filepath)
+
+    print('report for ' + filepath)
+    print('======================= reprows =======================')
+    Tests.show(rep_rows.cluster(), rep_rows.cols.all, 1, 0)
+    
+    
+    print('\n======================= repcols =======================')
+    Tests.show(rep_cols.cluster(), rep_cols.cols.all, 1, 0)
+
+    print('\n======================= replace =======================')
+    Repgrid.repplace(rep_rows)
+    return True
 
 ##
 # Loads a YAML configuration file "config.yml" into a Python dictionary
@@ -40,7 +58,8 @@ help_string = """USAGE: grid.py [OPTIONS] [-g ACTION] \n OPTIONS:\n"
       " -d  --dump      on crash, dump stack        = false \n"
       "-f   --file      name of file                = ../../etc/data/auto93.cs\n"
       "-F   --Far       distance to \"faraway\"     = .95"
-      "-g  --go         start-up action             = data\n"
+      "-g  --go         start-up action             = run all tests\n"
+      "-r  --repgrid    run repgrid actions on file = false\n"
       "-h  --help       show help                   = false\n"
       "-p  --p          distance coefficient        = 2\n"
       "-m  --min        stop clusters at N^min = .5"
@@ -48,7 +67,7 @@ help_string = """USAGE: grid.py [OPTIONS] [-g ACTION] \n OPTIONS:\n"
       "-q  --quit  exit \n"
       "-S  --Sample  sampling data size             = 512\n"""
 
-print("script.py : an example script with help text and a test suite. Enter -h/--help for help.\n")
+print("grid.py : A rep grid processor. Enter -h/--help for help.\n")
 
 run_csv = True
 
@@ -59,11 +78,14 @@ while run_csv:
     with open(YAMLFILE, "w") as config_file:
         config_file.write(yaml.dump(new_configs))
 
-    if new_configs['the']['help'] == True:
+    if new_configs['the']['help']:
         print(help_string)
 
-    if new_configs['the']['quit'] == True:
+    if new_configs['the']['quit']:
         quit()
 
-    if new_configs['the']['go'] == True:
+    if new_configs['the']['repgrid']:
+        run_repgrid(new_configs['the']['file'])
+
+    if new_configs['the']['go']:
         Tests.ALL()

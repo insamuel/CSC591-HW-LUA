@@ -1,0 +1,64 @@
+grid.py : A rep grid processor. Enter -h/--help for help.
+
+Select an option/s
+-r -f ../../etc/data/hw4_interview_repgrids/repgridC.csv   
+report for ../../etc/data/hw4_interview_repgrids/repgridC.csv
+======================= reprows =======================
+68.14
+|.. 59.84
+|.. |.. 49.8
+|.. |.. |.. 31.02
+|.. |.. |.. |.. Mario Kart 8 Deluxe
+|.. |.. |.. |.. Super Smash Bros. Ultimate
+|.. |.. |.. Nintendo Switch Sports
+|.. |.. 52.7
+|.. |.. |.. The Legend of Zelda: Breath of the Wild
+|.. |.. |.. Animal Crossing: New Horizons
+|.. 45.1
+|.. |.. 40.09
+|.. |.. |.. 40.09
+|.. |.. |.. |.. Pokemon Lets Go Pikachu!/Eevee!
+|.. |.. |.. |.. Fire Emblem: Three Houses
+|.. |.. |.. Splatoon 2
+|.. |.. 28.35
+|.. |.. |.. Mario Party Superstars
+|.. |.. |.. Splatoon 3
+
+======================= repcols =======================
+72.65
+|.. 58.27
+|.. |.. 35.57
+|.. |.. |.. No DLC:Tons of DLC
+|.. |.. |.. Annoying menu systems:Great menu systems
+|.. |.. 48.19
+|.. |.. |.. Boring characters:Interesting characters
+|.. |.. |.. Stale Gameplay:Revolutionary Gameplay
+|.. 74.95
+|.. |.. 39.67
+|.. |.. |.. Buggy:No bugs
+|.. |.. |.. Bad Graphics:Good Graphics
+|.. |.. Boring soundtrack:Amazing soundtrack
+
+======================= replace =======================
+A Animal Crossing: New Horizons
+B Pokemon Lets Go Pikachu!/Eevee!
+C Mario Party Superstars
+D Nintendo Switch Sports
+E Fire Emblem: Three Houses
+F Super Smash Bros. Ultimate
+G Mario Kart 8 Deluxe
+H Splatoon 2
+I Splatoon 3
+J The Legend of Zelda: Breath of the Wild
+. . . . . . . . . . . . . . . . . . . . .
+. G . . . . . . . . . . . . B . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . F . . . . . D . I . . . . . . . . . .
+. . . A . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+Select an option/s

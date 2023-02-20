@@ -1,0 +1,60 @@
+grid.py : A rep grid processor. Enter -h/--help for help.
+
+Select an option/s 
+-r -f ../../etc/data/hw4_interview_repgrids/repgridB.csv  
+report for ../../etc/data/hw4_interview_repgrids/repgridB.csv    
+======================= reprows =======================
+47.87
+|.. 41.11
+|.. |.. 40.4
+|.. |.. |.. 32.27
+|.. |.. |.. |.. Mario Kart 8 Deluxe
+|.. |.. |.. |.. The Legend of Zelda: Breath of the Wild
+|.. |.. |.. Pokemon Lets Go Pikachu!/Eevee!
+|.. |.. 21.78
+|.. |.. |.. Nintendo Switch Sports
+|.. |.. |.. Mario Party Superstars
+|.. 51.59
+|.. |.. 51.14
+|.. |.. |.. 21.78
+|.. |.. |.. |.. Splatoon 3
+|.. |.. |.. |.. Splatoon 2
+|.. |.. |.. Super Smash Bros. Ultimate
+|.. |.. 55.07
+|.. |.. |.. Animal Crossing: New Horizons
+|.. |.. |.. Fire Emblem: Three Houses
+
+======================= repcols =======================
+75.56
+|.. 60.35
+|.. |.. 36.85
+|.. |.. |.. Forgettable soundtrack:Amazing soundtrack
+|.. |.. |.. Bad character design:Great character design
+|.. |.. Feels unfinished:Feels complete
+|.. 59.84
+|.. |.. 55.56
+|.. |.. |.. Unpleasant Online Community:Great Online Community
+|.. |.. |.. Linear gameplay:Completely open world
+|.. |.. Bad atmosphere:Great atmosphere
+
+======================= replace =======================
+A Animal Crossing: New Horizons
+B Pokemon Lets Go Pikachu!/Eevee!
+C Mario Party Superstars
+D Nintendo Switch Sports
+E Fire Emblem: Three Houses
+F Super Smash Bros. Ultimate
+G Mario Kart 8 Deluxe
+H Splatoon 2
+I Splatoon 3
+J The Legend of Zelda: Breath of the Wild
+. . . . . . . . . . . . . . . . . . . . .
+. G . . . . . . . . I . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . E . H . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. C . . . . . . . . . . . . . . . . . . .
+. J . . . . . . . . . . . . . . . . . . .
+. . B F . . . . . . . . . . . . . . . . .
+Select an option/s

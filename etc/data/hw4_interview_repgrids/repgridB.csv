@@ -1,0 +1,20 @@
+local _ = " "
+return {
+ domain="Nintendo Switch Games",
+ cols={       	{'Unpleasant Online Community', 5, 2, 4, 4, 3, 2, 4, 3, 2, 4, 'Great Online Community'},
+						   {'Feels unfinished', 2, 4, 4, 3, 5, 5, 5, 4, 3, 5, 'Feels complete'},
+							 {'Bad atmosphere', 4, 3, 4, 4, 5, 3, 4, 5, 5, 4, 'Great atmosphere'},
+					 {'Forgettable soundtrack', 3, 2, 1, 2, 4, 5, 3, 5, 4, 2, 'Amazing soundtrack'},
+							{'Linear gameplay', 4, 2, 1, 1, 3, 2, 2, 3, 3, 5,'Completely open world'},
+				       {'Bad character design', 4, 3, 3, 2, 4, 5, 4, 5, 5, 4, 'Great character design'},
+rows={					                      { _, _, _, _, _, _, _, _, _, 'The Legend of Zelda: Breath of the Wild'},
+											  { _, _, _, _, _, _, _, _, 'Splatoon 3'},
+											  { _, _, _, _, _, _, _, 'Splatoon 2'},
+											  { _, _, _, _, _, _, 'Mario Kart 8 Deluxe'},
+											  { _, _, _, _, _, 'Super Smash Bros. Ultimate'},
+											  { _, _, _, _,  'Fire Emblem: Three Houses'},
+											  { _, _, _,  'Nintendo Switch Sports'},
+											  { _, _,  'Mario Party Superstars'},
+											  { _, 'Pokemon Let's Go Pikachu!/Eevee!'},
+											  {'Animal Crossing: New Horizons'}}
+}

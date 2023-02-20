@@ -216,13 +216,14 @@ def cli(args, configs):
 
     configs['the']['help'] = '-h' in args or '--help' in args
     configs['the']['go'] = '-g' in args or '--go' in args
+    configs['the']['repgrid'] = '-r' in args or '--repgrid' in args
     configs['the']['quit'] = '-q' in args or '--quit' in args
     configs['the']['dump'] = '-d' in args or '--dump' in args
-    configs['the']['file'] = find_arg_value(args, '-f', '--file') if ('-f' in args or '--file' in args) else '../../etc/data/auto93.csv'
+    configs['the']['file'] = find_arg_value(arg_arr, '-f', '--file') if ('-f' in args or '--file' in args) else '../../etc/data/auto93.csv'
    
     #find the seed value
     if '-s' in args or '--seed' in args:
-        seed_value = find_arg_value(args, '-s', '--seed')
+        seed_value = find_arg_value(arg_arr, '-s', '--seed')
         if seed_value is not None:
             try:
                 configs['the']['seed'] = int(seed_value)
@@ -232,8 +233,8 @@ def cli(args, configs):
         configs['the']['seed'] = 937162211
 
     #find the far value
-    if '-f' in args or '--far' in args:
-        far_value = find_arg_value(args, '-f', '--far')
+    if '-F' in args or '--Far' in args:
+        far_value = find_arg_value(arg_arr, '-f', '--far')
         if far_value is not None:
             try:
                 configs['the']['far'] = float(far_value)
@@ -244,7 +245,7 @@ def cli(args, configs):
 
     #find the min value
     if '-m' in args or '--min' in args:
-        min_value = find_arg_value(args, '-m', '--min')
+        min_value = find_arg_value(arg_arr, '-m', '--min')
         if min_value is not None:
             try:
                 configs['the']['min'] = float(min_value)
@@ -255,7 +256,7 @@ def cli(args, configs):
 
     #find the p value
     if '-p' in args or '--p' in args:
-        p_value = find_arg_value(args, '-p', '--p')
+        p_value = find_arg_value(arg_arr, '-p', '--p')
         if p_value is not None:
             try:
                 configs['the']['p'] = int(p_value)
@@ -266,7 +267,7 @@ def cli(args, configs):
     
     #find the sample value
     if '-s' in args or '--sample' in args:
-        sample_value = find_arg_value(args, '-s', '--sample')
+        sample_value = find_arg_value(arg_arr, '-s', '--sample')
         if sample_value is not None:
             try:
                 configs['the']['sample'] = int(sample_value)
