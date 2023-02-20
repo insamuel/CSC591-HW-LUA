@@ -1,0 +1,139 @@
+
+---------------------------------------
+{'dump': False, 'eg': 'ALL', 'far': 0.95, 'file': '../../etc/data/auto93.csv', 'go': False, 'help': False, 'min': 0.5, 'p': 2, 'quit': True, 'repgrid': False, 'sample': 512, 'seed': 937162211}
+!!!!!!	PASS	the	True
+
+---------------------------------------
+m1= 0.0, m2= 0.0, rounded= 0.0
+!!!!!!	FAIL	rand	True
+
+---------------------------------------
+!!!!!!	PASS	sym	True
+
+---------------------------------------
+mid= 1.5714285714285714, div= 0.787
+!!!!!!	PASS	num	True
+
+---------------------------------------
+!!!!!!	PASS	csv	True
+
+---------------------------------------
+!!!!!!	PASS	duplicate_structure	True
+
+---------------------------------------
+
+y	mid	{ :Lbs- 2970.42 :Acc+ 15.57 :Mpg+ 23.84}
+ 	div	{ :Lbs- 846.84 :Acc+ 2.76 :Mpg+ 8.34}
+x	mid	{ :Clndrs 5.45 :Volume 193.43 :Model 76.01 :origin 1}
+ 	div	{ :Clndrs 1.7 :Volume 104.27 :Model 3.7 :origin 1.3273558482394003}
+!!!!!!	PASS	t_data	True
+
+---------------------------------------
+{NUM, at: 0, hi: 5.0, lo: 1.0, m2: 13.5, mu: 1.75, n: 8, txt: ElectronicPublishing}
+{NUM, at: 1, hi: 5.0, lo: 1.0, m2: 17.875, mu: 2.375, n: 8, txt: VirtualReality}
+{NUM, at: 2, hi: 3.0, lo: 1.0, m2: 6.000000000000001, mu: 1.5, n: 8, txt: MultimediaAndHypermedia}
+{NUM, at: 3, hi: 5.0, lo: 1.0, m2: 18.875, mu: 2.125, n: 8, txt: VisualProgramming}
+{NUM, at: 4, hi: 5.0, lo: 1.0, m2: 14.874999999999998, mu: 1.8749999999999998, n: 8, txt: CrossPlatformGUIs}
+{NUM, at: 5, hi: 5.0, lo: 1.0, m2: 32.0, mu: 3.0, n: 8, txt: ObjectOrientedSystems}
+{NUM, at: 6, hi: 5.0, lo: 1.0, m2: 20.000000000000004, mu: 3.5, n: 8, txt: KnowledgeBasedSystems}
+{NUM, at: 7, hi: 5.0, lo: 2.0, m2: 10.874999999999998, mu: 4.125, n: 8, txt: IntelligentAgents}
+{NUM, at: 8, hi: 5.0, lo: 1.0, m2: 16.0, mu: 2.5, n: 8, txt: InformationHighway}
+{NUM, at: 9, hi: 5.0, lo: 1.0, m2: 15.875, mu: 2.375, n: 8, txt: BroadbandNetworks}
+{SYM, at: 10, most: 1, n: 8, txt: thingX}
+{ROW, cells: ['5', '3', '3', '1', '1', '1', '1', '3', '5', '5', 'DevelopmentTool:Application'] }
+{ROW, cells: ['2', '1', '1', '5', '5', '5', '5', '5', '1', '2', 'Multimedia:Programming'] }
+{ROW, cells: ['1', '3', '1', '3', '2', '5', '4', '3', '1', '1', 'CommunicationTechnology:ApplicationTechnology'] }
+{ROW, cells: ['2', '1', '1', '1', '3', '5', '3', '2', '2', '2', 'HumanOrientedTool:SystemTool'] }
+{ROW, cells: ['1', '5', '3', '4', '1', '1', '4', '5', '4', '4', 'ConventionalCommunication:NovelCommunication'] }
+{ROW, cells: ['1', '4', '1', '1', '1', '1', '1', '5', '3', '1', 'OnlyActAsProgrammed:Semi-autonomous'] }
+{ROW, cells: ['1', '1', '1', '1', '1', '1', '5', '5', '1', '1', 'ConventionalSystem:IntelligentSystem'] }
+{ROW, cells: ['1', '1', '1', '1', '1', '5', '5', '5', '3', '3', 'TargetedOnInterface:TargetedOnOverallSystem'] }
+
+!!!!!!	PASS	t_repcols	True
+
+---------------------------------------
+{NUM, at: 0, hi: 5.0, lo: 1.0, m2: 27.6, mu: 2.8, n: 10, txt: DevelopmentTool:Application}
+{NUM, at: 1, hi: 5.0, lo: 1.0, m2: 33.6, mu: 3.2, n: 10, txt: Multimedia:Programming}
+{NUM, at: 2, hi: 5.0, lo: 1.0, m2: 18.4, mu: 2.4, n: 10, txt: CommunicationTechnology:ApplicationTechnology}
+{NUM, at: 3, hi: 5.0, lo: 1.0, m2: 13.599999999999998, mu: 2.2000000000000006, n: 10, txt: HumanOrientedTool:SystemTool}
+{NUM, at: 4, hi: 5.0, lo: 1.0, m2: 23.6, mu: 3.2, n: 10, txt: ConventionalCommunication:NovelCommunication}
+{NUM, at: 5, hi: 5.0, lo: 1.0, m2: 20.9, mu: 1.9, n: 10, txt: OnlyActAsProgrammed:Semi-autonomous}
+{NUM, at: 6, hi: 5.0, lo: 1.0, m2: 25.6, mu: 1.8, n: 10, txt: ConventionalSystem:IntelligentSystem}
+{NUM, at: 7, hi: 5.0, lo: 1.0, m2: 30.4, mu: 2.5999999999999996, n: 10, txt: TargetedOnInterface:TargetedOnOverallSystem}
+{SYM, at: 8, most: 1, n: 10, txt: thingX}
+{ROW, cells: ['5', '2', '1', '2', '1', '1', '1', '1', 'ElectronicPublishing'] }
+{ROW, cells: ['3', '1', '3', '1', '5', '4', '1', '1', 'VirtualReality'] }
+{ROW, cells: ['3', '1', '1', '1', '3', '1', '1', '1', 'MultimediaAndHypermedia'] }
+{ROW, cells: ['1', '5', '3', '1', '4', '1', '1', '1', 'VisualProgramming'] }
+{ROW, cells: ['1', '5', '2', '3', '1', '1', '1', '1', 'CrossPlatformGUIs'] }
+{ROW, cells: ['1', '5', '5', '5', '1', '1', '1', '5', 'ObjectOrientedSystems'] }
+{ROW, cells: ['1', '5', '4', '3', '4', '1', '5', '5', 'KnowledgeBasedSystems'] }
+{ROW, cells: ['3', '5', '3', '2', '5', '5', '5', '5', 'IntelligentAgents'] }
+{ROW, cells: ['5', '1', '1', '2', '4', '3', '1', '3', 'InformationHighway'] }
+{ROW, cells: ['5', '2', '1', '2', '4', '1', '1', '3', 'BroadbandNetworks'] }
+
+!!!!!!	PASS	t_reprows	True
+
+---------------------------------------
+75.46
+|.. 55.9
+|.. |.. 38.73
+|.. |.. |.. ConventionalSystem:IntelligentSystem
+|.. |.. |.. TargetedOnInterface:TargetedOnOverallSystem
+|.. |.. 41.16
+|.. |.. |.. Multimedia:Programming
+|.. |.. |.. CommunicationTechnology:ApplicationTechnology
+|.. 67.44
+|.. |.. 54.26
+|.. |.. |.. DevelopmentTool:Application
+|.. |.. |.. ConventionalCommunication:NovelCommunication
+|.. |.. 57.01
+|.. |.. |.. HumanOrientedTool:SystemTool
+|.. |.. |.. OnlyActAsProgrammed:Semi-autonomous
+!!!!!!	PASS	t_synonyms	True
+
+---------------------------------------
+77.06
+|.. 59.29
+|.. |.. 48.41
+|.. |.. |.. 42.39
+|.. |.. |.. |.. KnowledgeBasedSystems
+|.. |.. |.. |.. IntelligentAgents
+|.. |.. |.. ObjectOrientedSystems
+|.. |.. 33.07
+|.. |.. |.. CrossPlatformGUIs
+|.. |.. |.. VisualProgramming
+|.. 52.29
+|.. |.. 31.87
+|.. |.. |.. 27.95
+|.. |.. |.. |.. ElectronicPublishing
+|.. |.. |.. |.. MultimediaAndHypermedia
+|.. |.. |.. BroadbandNetworks
+|.. |.. 34.23
+|.. |.. |.. VirtualReality
+|.. |.. |.. InformationHighway
+!!!!!!	PASS	t_prototypes	True
+
+---------------------------------------
+A ElectronicPublishing
+B VirtualReality
+C MultimediaAndHypermedia
+D VisualProgramming
+E CrossPlatformGUIs
+F ObjectOrientedSystems
+G KnowledgeBasedSystems
+H IntelligentAgents
+I InformationHighway
+J BroadbandNetworks
+. . . . . . . . . . . . . . . . . . . . .
+. G . . . . . . . . . . . . . . A . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . J . C . . . . . .
+. . . . . . . . . . . . . I . . . . . . .
+. . . . . . . . D . E . . . . . . . . . .
+. . H . . F . . . . . . . . . . . . . . .
+!!!!!!	PASS	t_repplace	True
+!!!!!!	PASS	ALL	True

@@ -242,29 +242,6 @@ def test_repplace():
 
     return True
 
-#@TestEngine.test
-def test_around():
-    generated_data = Repgrid.reprows('../../etc/data/repgrid1.csv')
-    around_res = generated_data.around(generated_data.rows[-1])
-
-    res_string = ""
-    for i in range(len(around_res)):
-        row = around_res[max(0, i -1)]
-        dist = rnd(generated_data.dist(row, generated_data.rows[-1]), 2)
-        res_string+= str(i) + "\t" + str(dist) + '\t' + str(row.cells) + '\n'
-    print(res_string)
-
-
-#@TestEngine.test
-def test_all():
-    rep_rows = Repgrid.reprows('../../etc/data/repgrid1.csv')
-    rep_cols = Repgrid.repcols('../../etc/data/repgrid1.csv')
-
-    show(rep_rows.cluster(), rep_rows.cols.all, 1, 0)
-    show(rep_cols.cluster(), rep_cols.cols.all, 1, 0)
-    Repgrid.repplace(rep_rows)
-    return True
-
 ##
 # Defines a function ALL using @TestEngine.test. This function calls other
 # functions, whose names start with eg_, stored in Common.eg, one by one,

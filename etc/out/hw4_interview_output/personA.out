@@ -1,0 +1,61 @@
+grid.py : A rep grid processor. Enter -h/--help for help.
+
+Select an option/s 
+-r -f ../../etc/data/hw4_interview_repgrids/repgridA.csv  
+report for ../../etc/data/hw4_interview_repgrids/repgridA.csv
+======================= reprows =======================
+68.55
+|.. 36.96
+|.. |.. 35.36
+|.. |.. |.. 28.87
+|.. |.. |.. |.. Mario Kart 8 Deluxe
+|.. |.. |.. |.. Super Smash Bros. Ultimate
+|.. |.. |.. The Legend of Zelda: Breath of the Wild
+|.. |.. 22.82
+|.. |.. |.. Splatoon 3
+|.. |.. |.. Splatoon 2
+|.. 64.37
+|.. |.. 55.9
+|.. |.. |.. 52.81
+|.. |.. |.. |.. Pokemon Lets Go Pikachu!/Eevee!
+|.. |.. |.. |.. Mario Party Superstars
+|.. |.. |.. Fire Emblem: Three Houses
+|.. |.. 22.82
+|.. |.. |.. Animal Crossing: New Horizons
+|.. |.. |.. Nintendo Switch Sports
+
+======================= repcols =======================
+81.22
+|.. 27.64
+|.. |.. 27.64
+|.. |.. |.. Unresponsive Controls:Responsive Controls
+|.. |.. |.. Buggy:Polished
+|.. |.. Bad Graphics:Beautiful Graphcis
+|.. 74.9
+|.. |.. 61.3
+|.. |.. |.. Forgettable/Nonexistant Plot:Amazing Plot
+|.. |.. |.. Easy:Difficult
+|.. |.. Not enough content:Lots to see and do
+
+======================= replace =======================
+A Animal Crossing: New Horizons
+B Pokemon Lets Go Pikachu!/Eevee!
+C Mario Party Superstars
+D Nintendo Switch Sports
+E Fire Emblem: Three Houses
+F Super Smash Bros. Ultimate
+G Mario Kart 8 Deluxe
+H Splatoon 2
+I Splatoon 3
+J The Legend of Zelda: Breath of the Wild
+. . . . . . . . . . . . . . . . . . . . .
+. G . . . . . . . . . . . . B . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . . . C . . . . . . . . . . . . . . . .
+. . . . . . . . . . . . . . . . . . . . .
+. . H . . . . . . . . . . . . . . . . . .
+. . J . . . . . . . . . . . . . . . . . .
+. I . . . . D . . . . . . . . . . . . . .
+. . . . A . . . . . . . . . . . . . . . .
+Select an option/s 
