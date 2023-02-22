@@ -6,10 +6,10 @@ import copy
 import functools
 import random
 
-from typing import List
+from typing import List, Union
 from Cols import Cols
 from Row import Row
-from Utils import read_csv, rand, get_rand_items, cos, many
+from Utils import read_csv, rand, get_rand_items, cos, many, kap
 
 with open("config.yml", 'r') as config_file:
     cfg = yaml.safe_load(config_file)
@@ -42,27 +42,12 @@ class Data:
             self.cols.add(new_row)
 
 
-    def stats(self):
-        #todo (km) i think this might be way too big of a stats report lol
-        # learn what this needs to print and likely trim it down
-        y_mid_report = '{'
-        y_div_report = '{'
-        for y in self.cols.y:
-            y_mid_report = y_mid_report + ' :' + y.txt + ' ' + str(y.rnd(y.mid(), 2))
-            y_div_report = y_div_report + ' :' + y.txt + ' ' + str(y.rnd(y.div(), 2))
-        y_mid_report = y_mid_report + '}'
-        y_div_report = y_div_report + '}'
+    def stats(self, what: str = None, cols: Union[Cols, None] = None, places: int = 2):
+        def fun(col):
+            whatFunc = getattr(col, what if what != None else "mid")
+            return col.rnd(whatFunc(), places), col.txt
 
-        x_mid_report = '{'
-        x_div_report = '{'
-        for x in self.cols.x:
-            x_mid_report = x_mid_report + ' :' + x.txt + ' ' + str(x.rnd(x.mid(), 2))
-            x_div_report = x_div_report + ' :' + x.txt + ' ' + str(x.rnd(x.div(), 2))
-        x_mid_report = x_mid_report + '}'
-        x_div_report = x_div_report + '}'
-
-        res_string = '\ny\tmid\t' + y_mid_report + '\n \tdiv\t' + y_div_report + '\nx\tmid\t' + x_mid_report + '\n \tdiv\t' + x_div_report
-        return res_string
+        return kap(cols if cols != None else self.cols.y, fun)
 
     def clone(self, rows: list[str] = None):
         if(rows == None):

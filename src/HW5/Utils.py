@@ -149,6 +149,13 @@ def coerce(s):
     else:
         return None or fun(s)
 
+def kap(list, func):
+    res = {}
+    for i, item in enumerate(list):
+        ret = func(item)
+        res[i] = ret
+    return res
+
 #find x,y from a line connecting `a` to `b`
 def cos(a, b, c):
     denominator = 1 if c == 0 else 2 * c

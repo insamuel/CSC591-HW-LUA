@@ -197,13 +197,7 @@ def show_tree(tree, level = None):
         report_string+= str(len(data.rows))
 
         if level == 0 or 'left' not in tree:
-            report_string+= '\n'
-            stats = data.stats()
-            lines = stats.splitlines()
-            for line in lines:
-                if len(line) == 0:
-                    continue
-                report_string+= ('    '*level) + line + '\n'
+            report_string+= '   ' + str(data.stats())
             
         print(report_string)
         show_tree(tree['left'] if 'left' in tree else None, level + 1)
@@ -265,9 +259,9 @@ def test_tree():
 def test_sway():
     data = Data('../../etc/data/auto93.csv')
     sway_res = data.sway()
-    print('all: ' + data.stats())
-    print('best: ' + sway_res['best'].stats())
-    print('rest: ' + sway_res['rest'].stats())
+    print('all: ' + str(data.stats()))
+    print('best: ' + str(sway_res['best'].stats()))
+    print('rest: ' + str(sway_res['rest'].stats()))
     return True # todo (km) check if these are correct
 
 ##
