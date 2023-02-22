@@ -88,18 +88,17 @@ def rand(lo = None, hi = None):
     :param hi: Higher limit of generated number
     :return: Pseudo-random number
     """
-    if lo is None:
+    if not lo:
         lo = 0
 
-    if hi is None:
+    if not hi:
         hi = 1
 
-    rand = random.Random()
-    rand.seed(Common.cfg['the']['seed'])
-    return rand.randrange(lo, hi)
+    configs['the']['seed'] = (16807 * configs['the']['seed']) % 2147483647
+    return lo + (hi - lo) * configs['the']['seed'] / 2147483647
 
 def get_rand_items(list, item_count: int):
-    return random.choices(list, k=item_count)
+    return random.sample(list, item_count)
 
 ##
 # Defines a function "rnd" that takes a floating point number x and an
@@ -152,10 +151,10 @@ def coerce(s):
 
 #find x,y from a line connecting `a` to `b`
 def cos(a, b, c):
-    c = max(c, 1)
-    x1 = (pow(a, 2) + pow(b, 2) + pow(c, 2)) / (2 * c)
+    denominator = 1 if c == 0 else 2 * c
+    x1 = (pow(a, 2) + pow(c, 2) - pow(b, 2)) / denominator
     x2 = max(0, min(1, x1))
-    y = pow((pow(a, 2) - pow(x2, 2)), 0.5)
+    y = pow(abs((pow(a, 2) - pow(x2, 2))), 0.5)
     return {'x': x2, 'y': y}
 
 
@@ -187,7 +186,7 @@ def read_csv(fname, fun=None):
         csv_list = []
         with open(fname, 'r') as csv_file:
             csv_list = list(csv.reader(csv_file, delimiter=','))
-
+        
         if fun != None:
             for item in csv_list:
                 fun(item)
@@ -208,161 +207,54 @@ def cli(args, configs):
         arg_arr.remove("-e")
 
 
-    def find_arg_value(args: list[str], optionA: str, optionB: str) -> str:
+    def find_arg_value(args: list[str], optionA: str, optionB: str, defaultValue) -> str:
+        if optionA not in args and optionB not in args:
+            return defaultValue
         index = args.index(optionA) if optionA in args else args.index(optionB)
         if (index + 1) < len(args):
             return args[index + 1]
         return None
 
-    configs['the']['quit'] = '-q' in args or '--quit' in args
-    configs['the']['dump'] = '-d' in args or '--dump' in args
-
-    ##
-    # Initial number of bins
-    ##
-    if '-b' in args or '--bins' in args:
-        bin_value = find_arg_value(args, '-b', '--bins')
-        if bin_value is not None:
-            try:
-                configs['the']['bins'] = int(bin_value)
-            except ValueError:
-                raise ValueError("Bin value must be an integer!")
-    else:
-        configs['the']['bins'] = 16
-
-    ##
-    # Cliff's delta threshold
-    ##
-    if '-c' in args or '--cliffs' in args:
-        cliff_value = find_arg_value(args, '-c', '--cliffs')
-        if cliff_value is not None:
-            try:
-                configs['the']['cliffs'] = float(cliff_value)
-            except ValueError:
-                raise ValueError("Cliff value must be a float!")
-    else:
-        configs['the']['cliff'] = .147
-
-    ##
-    # Data file
-    ##
-    configs['the']['file'] = find_arg_value(args, '-f', '--file') if ('-f' in args or '--file' in args) else '../../etc/data/auto93.csv'
-
-    ##
-    # Find the far value
-    ##
-    if '-f' in args or '--far' in args:
-        far_value = find_arg_value(args, '-f', '--far')
-        if far_value is not None:
-            try:
-                configs['the']['far'] = float(far_value)
-            except ValueError:
-                raise ValueError("Far value must be a float!")
-    else:
-        configs['the']['far'] = 0.95
-
-    ##
-    # Start-up action
-    ##
-    configs['the']['go'] = '-g' in args or '--go' in args
-
-    ##
-    # Show help
-    ##
     configs['the']['help'] = '-h' in args or '--help' in args
-
-    ##
-    # Search space for clustering
-    ##
-    if '-H' in args or '--Halves' in args:
-        halves_value = find_arg_value(args, '-H', '--Halves')
-        if halves_value is not None:
-            try:
-                configs['the']['Halves'] = int(halves_value)
-            except ValueError:
-                raise ValueError("Halves value must be an integer!")
-    else:
-        configs['the']['Halves'] = 512
-
-    ##
-    # Size of smallest cluster
-    ##
-    if '-m' in args or '--min' in args:
-        min_value = find_arg_value(args, '-m', '--min')
-        if min_value is not None:
-            try:
-                configs['the']['min'] = float(min_value)
-            except ValueError:
-                raise ValueError("Min value must be a float!")
-    else:
-        configs['the']['min'] = 0.5
-
-    ##
-    # Max numbers
-    ##
-    if '-M' in args or '--Max' in args:
-        max_value = find_arg_value(args, '-H', '--Halves')
-        if halves_value is not None:
-            try:
-                configs['the']['Max'] = int(max_value)
-            except ValueError:
-                raise ValueError("Max value must be an integer!")
-    else:
-        configs['the']['Max'] = 512
-
-    ##
-    # dist coefficient
-    ##
-    if '-p' in args or '--p' in args:
-        p_value = find_arg_value(args, '-p', '--p')
-        if p_value is not None:
-            try:
-                configs['the']['p'] = int(p_value)
-            except ValueError:
-                raise ValueError("P value must be an integer!")
-    else:
-        configs['the']['p'] = 2
-
-    ##
-    # How many of rest to sample
-    ##
-    if '-r' in args or '--rest' in args:
-        rest_value = find_arg_value(args, '-r', '--rest')
-        if rest_value is not None:
-            try:
-                configs['the']['rest'] = int(rest_value)
-            except ValueError:
-                raise ValueError("Rest value must be an integer!")
-    else:
-        configs['the']['rest'] = 4
-
-    ##
-    # Child splits reuse a parent pole
-    ##
-    if '-R' in args or '--Reuse' in args:
-        reuse_value = find_arg_value(args, '-R', '--Reuse')
-        if reuse_value is not None:
-            try:
-                configs['the']['Reuse'] = int(reuse_value)
-            except ValueError:
-                raise ValueError("Rest value must be an integer!")
-    else:
-        configs['the']['Reuse'] = True
-
-    ##
-    # Random number seed
-    ##
-    if '-s' in args or '--seed' in args:
-        seed_value = find_arg_value(args, '-s', '--seed')
-        if seed_value is not None:
-            try:
-                configs['the']['seed'] = int(seed_value)
-            except ValueError:
-                raise ValueError("Seed value must be an integer!")
-    else:
-        configs['the']['seed'] = 937162211
+    configs['the']['go'] = '-g' in args or '--go' in args
+    configs['the']['quit'] = '-q' in args or '--quit' in args
+    configs['the']['file'] = find_arg_value(arg_arr, '-f', '--file', '../../etc/data/auto93.csv')
+    configs['the']['cliffs'] = find_arg_value(arg_arr, '-c', '--cliffs', 0.147)
+    configs['the']['Far'] = find_arg_value(arg_arr, '-F', '--Far', 0.95)
+    configs['the']['Halves'] = find_arg_value(arg_arr, '-H', '--Halves', 512)
+    configs['the']['min'] = find_arg_value(arg_arr, '-m', '--min', 0.5)
+    configs['the']['Max'] = find_arg_value(arg_arr, '-M', '--Max', 512)
+    configs['the']['p'] = find_arg_value(arg_arr, '-p', '--p', 2)
+    configs['the']['rest'] = find_arg_value(arg_arr, '-r', '--rest', 4)
+    configs['the']['Reuse'] = find_arg_value(arg_arr, '-R', '--Reuse', True)
+    configs['the']['seed'] = find_arg_value(arg_arr, '-s', '--seed', 937162211)
 
     return configs
+
+def many(list, count):
+    return random.sample(list, k = count)
+
+def cliffs_delta(nsA, nsB):
+    if len(nsA) > 256:
+        nsA = many(nsA, 256)
+    if len(nsB) > 256:
+        nsB = many(nsB, 256)
+    if len(nsA) > 10 * len(nsB):
+        nsA = many(nsA, 10 * len(nsB))
+    if len(nsB) > 10 * len(nsA):
+        nsB = many(nsB, 10 * len(nsA))
+
+    n, gt, lt = 0, 0, 0
+    for itemA in nsA:
+        for itemB in nsB:
+            n+= 1
+            if itemA > itemB:
+                gt+= 1
+            if itemA < itemB:
+                lt+= 1
+    
+    return (abs(lt - gt) / n) > Common.cfg['the']['cliffs']
+
 
 ##
 # Function sets the value of seed in the dictionary configs['the'] to x.
