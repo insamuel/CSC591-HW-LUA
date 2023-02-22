@@ -2,6 +2,7 @@ from subprocess import call
 import os
 import csv
 import random
+import copy
 
 import Common
 import math
@@ -261,6 +262,49 @@ def cliffs_delta(nsA, nsB):
                 lt+= 1
     
     return (abs(lt - gt) / n) > Common.cfg['the']['cliffs']
+
+def extend(range, n, s): # range is a num or a sym
+    range.lo = min(n, range.lo)
+    range.hi = max(n, range.hi)
+    range.add(s)
+
+def merge(col1, col2):# col is a num or a sym
+    col1_copy = copy.deepcopy(col1)
+
+    for x, n in enumerate(col2):
+        col1_copy.add(x)
+    col1_copy.lo = min(col1.lo, col2.lo)
+    col1_copy.hi = max(col1.hi, col2.hi)
+    return col1_copy
+
+def merge2(col1, col2): # col is a num or a sym
+    merged = merge(col1, col2)
+    if merged.div() <= ((col1.div() * col1.n) + (col2.div() * col2.n)) / merged.n:
+        return merged
+    return None
+
+def merge_any(ranges0):
+
+    def no_gaps(t):
+        for j in range(1, len(t)):
+            t[j].lo = t[j - 1].hi
+        t[0].lo = -math.inf
+        t[-1].hi = math.inf
+        return t
+
+    ranges1, j, left, right, y = [], 0, {}, {}, 0
+    while j < len(ranges0):
+        left = ranges0[j]
+        right = ranges0[j + 1] if (j + 1) < len(ranges0) else None
+        if right != None:
+            y = merge2(left, right)
+            if y != None:
+                j+= 1
+                left.hi = right.hi
+                #what is y??
+        ranges1.append(left)
+        j+= 1
+    return len(ranges0) == len(ranges1) and (no_gaps(ranges0) or merge_any(ranges1))
 
 
 ##

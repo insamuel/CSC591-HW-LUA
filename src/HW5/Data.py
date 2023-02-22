@@ -9,7 +9,7 @@ import random
 from typing import List, Union
 from Cols import Cols
 from Row import Row
-from Utils import read_csv, rand, get_rand_items, cos, many, kap
+from Utils import read_csv, rand, cos, many, kap, extend
 
 with open("config.yml", 'r') as config_file:
     cfg = yaml.safe_load(config_file)
@@ -236,4 +236,20 @@ class Data:
             here['left'] = self.tree(half_res['left'], cols, half_res['A'])
             here['right'] = self.tree(half_res['right'], cols, half_res['B'])
         return here
+
+    def bins(self, cols, sway_res ):
+        out = []
+        for col in cols:
+            ranges = [] #this is not going to work currently... python typing hell
+            for y, row in enumerate(sway_res):
+                for item in row:
+                    x = row[col.at]
+                    if x != '?':
+                        k = bin(col, x)
+                        ranges[k] = ranges[k] or col
+                        extend(ranges[k], x, y)
+            ranges = sorted(list(map(ranges, self)), key=lambda x: x["lo"])
+            # ^ check what this means in python
+            #out.append()
+
         

@@ -264,6 +264,23 @@ def test_sway():
     print('rest: ' + str(sway_res['rest'].stats()))
     return True # todo (km) check if these are correct
 
+@TestEngine.test
+def test_bin():
+    data = Data('../../etc/data/auto93.csv')
+    sway_res = data.sway()
+
+    print_res = '[all] best: ' + str(len(sway_res['best'])) + ', rest: ' + str(len(sway_res['rest']))
+    # for i, bin_res in enumerate(data.bins(data.cols.x, sway_res)):
+    #     for item in bin_res:
+    #         #if item.txt != b4
+    #         #b4 stuff
+    #         #print a bunch of stuff
+
+    
+    return True
+
+
+
 ##
 # Defines a function ALL using @TestEngine.test. This function calls other
 # functions, whose names start with eg_, stored in Common.eg, one by one,
