@@ -3,16 +3,17 @@ the:
   Halves: 512
   Max: 512
   Reuse: true
+  bins: 16
   cliffs: 0.147
   dump: false
   eg: ALL
   far: 0.95
   file: ../../etc/data/auto93.csv
-  go: false
+  go: true
   help: false
   min: 0.5
   p: 2
-  quit: true
+  quit: false
   rest: 4
   sample: 512
   seed: 937162211

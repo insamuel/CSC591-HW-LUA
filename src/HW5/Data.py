@@ -9,7 +9,8 @@ import random
 from typing import List, Union
 from Cols import Cols
 from Row import Row
-from Utils import read_csv, rand, cos, many, kap, extend
+from Sym import Sym
+from Utils import read_csv, rand, cos, many, kap, extend, merge_any
 
 with open("config.yml", 'r') as config_file:
     cfg = yaml.safe_load(config_file)
@@ -237,19 +238,42 @@ class Data:
             here['right'] = self.tree(half_res['right'], cols, half_res['B'])
         return here
 
-    def bins(self, cols, sway_res ):
+    def bin(self, col, x):
+        if x == '?' or type(col) == Sym:
+            return x
+        tmp = (col.hi - col.lo) / (Common.cfg['the']['bins'] - 1)
+        return 1 if (col.hi == col.lo) else (math.floor(float(x) / tmp + 0.5) * tmp)
+
+    def bins(self, cols, rows_set):
         out = []
         for col in cols:
-            ranges = [] #this is not going to work currently... python typing hell
-            for y, row in enumerate(sway_res):
-                for item in row:
-                    x = row[col.at]
+            ranges = {}
+            is_sym = type(col) == Sym
+            for y, data in enumerate(rows_set.values()): #this will go over best, rest groups
+                for row in data.rows:
+                    x = row.cells[col.at]
                     if x != '?':
-                        k = bin(col, x)
-                        ranges[k] = ranges[k] or col
-                        extend(ranges[k], x, y)
-            ranges = sorted(list(map(ranges, self)), key=lambda x: x["lo"])
-            # ^ check what this means in python
-            #out.append()
+                        k = int(self.bin(col, x))
+                        if k not in ranges:
+                            col.min = x
+                            ranges[k] = col
+                        extend(ranges[k], float(x), y)
+
+            ranges = { key: value for key, value in sorted(ranges.items(), key=lambda x: x[1].lo) }
+            
+            new_ranges_dict = {}
+            for i, key in enumerate(ranges):
+                new_ranges_dict[i] = ranges[key]
+
+            new_ranges_list = []
+            if is_sym:
+                for item in new_ranges_dict.values():
+                    new_ranges_list.append(item)
+            out.append(
+                new_ranges_list
+                if is_sym
+                else merge_any(new_ranges_dict)
+            )
+        return out
 
         

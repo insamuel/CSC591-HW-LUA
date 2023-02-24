@@ -40,6 +40,7 @@ class Num():
         self.at = col_position
         self.txt = col_name
 
+        self.has = {}
         self.n = 0
         self.mu = 0
         self.m2 = 0
@@ -78,6 +79,11 @@ class Num():
     def add(self, value):
         if value != '?':
             float_value = float(value)
+            if float_value in self.has:
+                self.has[float_value] = self.has[float_value] + 1
+            else:
+                self.has[float_value] = 1
+
             self.n = self.n + 1
             d = float_value - self.mu
             self.mu = self.mu + (d / self.n)
@@ -85,6 +91,11 @@ class Num():
             self.lo = min(float_value, self.lo)
             self.hi = max(float_value, self.hi)
 
+    def set_lo(self, x: float):
+        self.lo = x
+
+    def set_hi(self, x: float):
+        self.hi = x
 
     ##
     # Central tendency; for Nums, this is mean

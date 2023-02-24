@@ -269,14 +269,17 @@ def test_bin():
     data = Data('../../etc/data/auto93.csv')
     sway_res = data.sway()
 
-    print_res = '[all] best: ' + str(len(sway_res['best'])) + ', rest: ' + str(len(sway_res['rest']))
-    # for i, bin_res in enumerate(data.bins(data.cols.x, sway_res)):
-    #     for item in bin_res:
-    #         #if item.txt != b4
-    #         #b4 stuff
-    #         #print a bunch of stuff
+    print('[all] best: ' + str(len(sway_res['best'].rows)) + ', rest: ' + str(len(sway_res['rest'].rows)))
+    b4 = None
+    for bin_res in data.bins(data.cols.x, sway_res):
+        for range in bin_res:
+            if range.txt != b4:
+                print('')
+            b4 = range.txt
+            print('{ ' + range.txt + ', ' + str(range.lo) + ', ' + str(range.hi) + '}')
+            #  rnd(value(range.y.has, len(best.rows), len(rest.rows), "best")),
+            #     o(range.y.has),
 
-    
     return True
 
 

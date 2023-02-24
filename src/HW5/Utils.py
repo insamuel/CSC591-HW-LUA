@@ -9,6 +9,8 @@ import math
 import yaml
 from pathlib import Path
 
+from Sym import Sym
+
 ##
 # Imports call from subprocess, math, yaml and Path from pathlib
 #
@@ -226,6 +228,7 @@ def cli(args, configs):
     configs['the']['help'] = '-h' in args or '--help' in args
     configs['the']['go'] = '-g' in args or '--go' in args
     configs['the']['quit'] = '-q' in args or '--quit' in args
+    configs['the']['bins'] = find_arg_value(arg_arr, '-b', '--bins', 16)
     configs['the']['file'] = find_arg_value(arg_arr, '-f', '--file', '../../etc/data/auto93.csv')
     configs['the']['cliffs'] = find_arg_value(arg_arr, '-c', '--cliffs', 0.147)
     configs['the']['Far'] = find_arg_value(arg_arr, '-F', '--Far', 0.95)
@@ -264,17 +267,20 @@ def cliffs_delta(nsA, nsB):
     return (abs(lt - gt) / n) > Common.cfg['the']['cliffs']
 
 def extend(range, n, s): # range is a num or a sym
-    range.lo = min(n, range.lo)
-    range.hi = max(n, range.hi)
+    range.set_lo(min(n, range.lo))
+    range.set_hi(max(n, range.hi))
     range.add(s)
 
 def merge(col1, col2):# col is a num or a sym
     col1_copy = copy.deepcopy(col1)
 
-    for x, n in enumerate(col2):
-        col1_copy.add(x)
-    col1_copy.lo = min(col1.lo, col2.lo)
-    col1_copy.hi = max(col1.hi, col2.hi)
+    for item in col2.has:
+        col1_copy.add(item)
+    
+    if type(col1_copy) != Sym:
+        col1_copy.set_lo(min(col1.lo, col2.lo))
+        col1_copy.set_lo(max(col1.hi, col2.hi))
+
     return col1_copy
 
 def merge2(col1, col2): # col is a num or a sym
@@ -283,13 +289,13 @@ def merge2(col1, col2): # col is a num or a sym
         return merged
     return None
 
-def merge_any(ranges0):
+def merge_any(ranges0): #ranges0: sorted lists of ranges (syms/nums)
 
     def no_gaps(t):
         for j in range(1, len(t)):
-            t[j].lo = t[j - 1].hi
-        t[0].lo = -math.inf
-        t[-1].hi = math.inf
+            t[j].set_lo(t[j - 1].hi)
+        t[0].set_lo(-math.inf)
+        t[-1].set_hi(math.inf)
         return t
 
     ranges1, j, left, right, y = [], 0, {}, {}, 0
@@ -301,10 +307,10 @@ def merge_any(ranges0):
             if y != None:
                 j+= 1
                 left.hi = right.hi
-                #what is y??
         ranges1.append(left)
         j+= 1
-    return len(ranges0) == len(ranges1) and (no_gaps(ranges0) or merge_any(ranges1))
+    
+    return no_gaps(ranges0) if len(ranges0) == len(ranges1) else merge_any(ranges1)
 
 
 ##
