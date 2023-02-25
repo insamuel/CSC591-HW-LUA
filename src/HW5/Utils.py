@@ -243,7 +243,7 @@ def cli(args, configs):
     return configs
 
 def many(list, count):
-    return random.sample(list, k = count)
+    return random.choices(list, k = count)
 
 def cliffs_delta(nsA, nsB):
     if len(nsA) > 256:
@@ -266,30 +266,32 @@ def cliffs_delta(nsA, nsB):
     
     return (abs(lt - gt) / n) > Common.cfg['the']['cliffs']
 
-def extend(range, n, s): # range is a num or a sym
+def extend(range, n): # range is a num or a sym
     range.set_lo(min(n, range.lo))
     range.set_hi(max(n, range.hi))
-    range.add(s)
+    #range.add(s)
 
 def merge(col1, col2):# col is a num or a sym
     col1_copy = copy.deepcopy(col1)
-
-    for item in col2.has:
-        col1_copy.add(item)
+    t = type(col2.has)
+    for item, count in col2.has.items():
+        for i in range(count):
+            col1_copy.add(item)
     
-    if type(col1_copy) != Sym:
-        col1_copy.set_lo(min(col1.lo, col2.lo))
-        col1_copy.set_lo(max(col1.hi, col2.hi))
+    col1_copy.set_lo(min(col1.lo, col2.lo))
+    col1_copy.set_hi(max(col1.hi, col2.hi))
 
     return col1_copy
 
 def merge2(col1, col2): # col is a num or a sym
     merged = merge(col1, col2)
-    if merged.div() <= ((col1.div() * col1.n) + (col2.div() * col2.n)) / merged.n:
+    col1div = col1.div()
+    col2div = col2.div()
+    if merged.div() <= (((col1.div() * col1.n) + (col2.div() * col2.n)) / merged.n):
         return merged
     return None
 
-def merge_any(ranges0): #ranges0: sorted lists of ranges (syms/nums)
+def merge_any(ranges0): #ranges0: sorted lists of ranges (nums)
 
     def no_gaps(t):
         for j in range(1, len(t)):
@@ -306,12 +308,24 @@ def merge_any(ranges0): #ranges0: sorted lists of ranges (syms/nums)
             y = merge2(left, right)
             if y != None:
                 j+= 1
-                left.hi = right.hi
+                left.set_hi(right.hi)
         ranges1.append(left)
         j+= 1
     
     return no_gaps(ranges0) if len(ranges0) == len(ranges1) else merge_any(ranges1)
 
+
+def get_value(has, nB = 1, nR = 1, goal = "True"):
+    b = 0
+    r = 0
+    for x, n in has.items():
+        if x == goal:
+            b+= n
+        else:
+            r+= n
+    b = b / (nB + 1 / float('inf'))
+    r = r / (nR + 1 / float('inf'))
+    return pow(b, 2) / (b + r)
 
 ##
 # Function sets the value of seed in the dictionary configs['the'] to x.

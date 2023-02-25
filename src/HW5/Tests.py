@@ -8,7 +8,7 @@ from Num import Num
 from Sym import Sym
 from Row import Row
 from Cols import Cols
-from Utils import rnd, canPrint, rand, set_seed, read_csv, cliffs_delta
+from Utils import rnd, canPrint, rand, set_seed, read_csv, cliffs_delta, get_value
 
 command_line_args = []
 
@@ -276,9 +276,8 @@ def test_bin():
             if range.txt != b4:
                 print('')
             b4 = range.txt
+            #val = get_value(range.has, len(sway_res['best'].rows), len(sway_res['rest'].rows), "best")
             print('{ ' + range.txt + ', ' + str(range.lo) + ', ' + str(range.hi) + '}')
-            #  rnd(value(range.y.has, len(best.rows), len(rest.rows), "best")),
-            #     o(range.y.has),
 
     return True
 

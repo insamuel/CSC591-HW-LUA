@@ -10,6 +10,7 @@ from typing import List, Union
 from Cols import Cols
 from Row import Row
 from Sym import Sym
+from Num import Num
 from Utils import read_csv, rand, cos, many, kap, extend, merge_any
 
 with open("config.yml", 'r') as config_file:
@@ -244,35 +245,30 @@ class Data:
         tmp = (col.hi - col.lo) / (Common.cfg['the']['bins'] - 1)
         return 1 if (col.hi == col.lo) else (math.floor(float(x) / tmp + 0.5) * tmp)
 
-    def bins(self, cols, rows_set):
+    def bins(self, cols, rows_set): #rows_set = best, rest result from sway
         out = []
-        for col in cols:
+        for col in cols: #Col objects
             ranges = {}
             is_sym = type(col) == Sym
-            for y, data in enumerate(rows_set.values()): #this will go over best, rest groups
+            i = 0
+            for name, data in rows_set.items(): #this will go over best, rest groups (lists of Rows)
                 for row in data.rows:
                     x = row.cells[col.at]
                     if x != '?':
                         k = int(self.bin(col, x))
                         if k not in ranges:
-                            col.min = x
-                            ranges[k] = col
-                        extend(ranges[k], float(x), y)
+                            new_col = copy.deepcopy(col)
+                            new_col.set_lo(float(x))
+                            ranges[k] = new_col
+                        extend(ranges[k], float(x))
+                        i+= 1
 
             ranges = { key: value for key, value in sorted(ranges.items(), key=lambda x: x[1].lo) }
             
-            new_ranges_dict = {}
-            for i, key in enumerate(ranges):
-                new_ranges_dict[i] = ranges[key]
-
-            new_ranges_list = []
-            if is_sym:
-                for item in new_ranges_dict.values():
-                    new_ranges_list.append(item)
             out.append(
-                new_ranges_list
+                list(ranges.values())
                 if is_sym
-                else merge_any(new_ranges_dict)
+                else merge_any(list(ranges.values()))
             )
         return out
 
