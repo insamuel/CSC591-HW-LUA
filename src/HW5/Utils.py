@@ -266,53 +266,63 @@ def cliffs_delta(nsA, nsB):
     
     return (abs(lt - gt) / n) > Common.cfg['the']['cliffs']
 
-def extend(range, n): # range is a num or a sym
-    range.set_lo(min(n, range.lo))
-    range.set_hi(max(n, range.hi))
-    #range.add(s)
 
 def merge(col1, col2):# col is a num or a sym
     col1_copy = copy.deepcopy(col1)
-    t = type(col2.has)
     for item, count in col2.has.items():
         for i in range(count):
             col1_copy.add(item)
     
-    col1_copy.set_lo(min(col1.lo, col2.lo))
-    col1_copy.set_hi(max(col1.hi, col2.hi))
+    # col1_copy.set_lo(min(col1.lo, col2.lo))
+    # col1_copy.set_hi(max(col1.hi, col2.hi))
 
     return col1_copy
 
 def merge2(col1, col2): # col is a num or a sym
     merged = merge(col1, col2)
-    col1div = col1.div()
-    col2div = col2.div()
     if merged.div() <= (((col1.div() * col1.n) + (col2.div() * col2.n)) / merged.n):
         return merged
     return None
 
+# A representation of a Num or Col without it's actual values represented. 
+class Range():
+    def __init__(self, txt: str = "", lo: float = -math.inf, hi: float = math.inf):
+        self.txt = txt
+        self.lo = lo
+        self.hi = hi
+
+
 def merge_any(ranges0): #ranges0: sorted lists of ranges (nums)
 
-    def no_gaps(t):
-        for j in range(1, len(t)):
-            t[j].set_lo(t[j - 1].hi)
-        t[0].set_lo(-math.inf)
-        t[-1].set_hi(math.inf)
-        return t
+    def get_no_gaps_ranges(t):
+        col_count = len(t)
+        out_list = [Range() for i in range(col_count)]
+        for j in range(col_count): # copy over the txt, high, and lo values
+            out_list[j].txt = t[j].txt
+            out_list[j].lo = t[j].lo
+            out_list[j].hi = t[j].hi
 
-    ranges1, j, left, right, y = [], 0, {}, {}, 0
+        for j in range(1, col_count): # shift things
+            out_list[j].lo = t[j - 1].hi
+
+        out_list[0].lo = -math.inf
+        out_list[-1].hi = math.inf
+        return out_list
+
+    ranges1, j = [], 0
     while j < len(ranges0):
         left = ranges0[j]
+        to_add = left
         right = ranges0[j + 1] if (j + 1) < len(ranges0) else None
         if right != None:
             y = merge2(left, right)
             if y != None:
                 j+= 1
-                left.set_hi(right.hi)
-        ranges1.append(left)
+                to_add = y
+        ranges1.append(to_add)
         j+= 1
     
-    return no_gaps(ranges0) if len(ranges0) == len(ranges1) else merge_any(ranges1)
+    return get_no_gaps_ranges(ranges0) if len(ranges0) == len(ranges1) else merge_any(ranges1)
 
 
 def get_value(has, nB = 1, nR = 1, goal = "True"):

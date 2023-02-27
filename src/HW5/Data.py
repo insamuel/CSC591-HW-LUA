@@ -11,7 +11,7 @@ from Cols import Cols
 from Row import Row
 from Sym import Sym
 from Num import Num
-from Utils import read_csv, rand, cos, many, kap, extend, merge_any
+from Utils import read_csv, rand, cos, many, kap, merge_any,merge
 
 with open("config.yml", 'r') as config_file:
     cfg = yaml.safe_load(config_file)
@@ -250,26 +250,24 @@ class Data:
         for col in cols: #Col objects
             ranges = {}
             is_sym = type(col) == Sym
-            i = 0
+
+            names = {}
             for name, data in rows_set.items(): #this will go over best, rest groups (lists of Rows)
                 for row in data.rows:
                     x = row.cells[col.at]
                     if x != '?':
                         k = int(self.bin(col, x))
                         if k not in ranges:
-                            new_col = copy.deepcopy(col)
-                            new_col.set_lo(float(x))
-                            ranges[k] = new_col
-                        extend(ranges[k], float(x))
-                        i+= 1
+                            ranges[k] = copy.deepcopy(col)
+                        else:
+                            ranges[k].add(x)
 
             ranges = { key: value for key, value in sorted(ranges.items(), key=lambda x: x[1].lo) }
             
-            out.append(
-                list(ranges.values())
-                if is_sym
-                else merge_any(list(ranges.values()))
-            )
+            to_add = list(ranges.values()) if is_sym else merge_any(list(ranges.values()))
+            # out_dict = {'dist': names, 'vals': to_add}
+            out.append(to_add)
+            
         return out
 
         

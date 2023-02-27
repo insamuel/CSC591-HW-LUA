@@ -279,7 +279,7 @@ def test_bin():
             #val = get_value(range.has, len(sway_res['best'].rows), len(sway_res['rest'].rows), "best")
             print('{ ' + range.txt + ', ' + str(range.lo) + ', ' + str(range.hi) + '}')
 
-    return True
+    return False
 
 
 
