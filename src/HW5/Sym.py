@@ -42,6 +42,7 @@ class Sym():
         self.lo = float('inf')
         self.hi = float('-inf')
 
+
     def set_lo(self, x: float):
         self.lo = x
         self.hi = x

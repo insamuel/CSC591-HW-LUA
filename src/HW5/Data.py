@@ -258,14 +258,14 @@ class Data:
                     if x != '?':
                         k = int(self.bin(col, x))
                         if k not in ranges:
-                            ranges[k] = copy.deepcopy(col)
-                        else:
+                            ranges[k] = Sym(col.at, col.txt) if is_sym else Num(col.at, col.txt)
+                        
+                        if not is_sym and float(x) not in ranges[k].has.keys():
                             ranges[k].add(x)
 
             ranges = { key: value for key, value in sorted(ranges.items(), key=lambda x: x[1].lo) }
             
             to_add = list(ranges.values()) if is_sym else merge_any(list(ranges.values()))
-            # out_dict = {'dist': names, 'vals': to_add}
             out.append(to_add)
             
         return out

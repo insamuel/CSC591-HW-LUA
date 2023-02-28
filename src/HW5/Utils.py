@@ -167,6 +167,9 @@ def cos(a, b, c):
     y = pow(abs((pow(a, 2) - pow(x2, 2))), 0.5)
     return {'x': x2, 'y': y}
 
+def per(t, p):
+    p = math.floor((p * len(t)) + 0.5)
+    return t[max(1, min(len(t), p)) - 1]
 
 ##
 # Call "fun" on each row. Row cells are divided in "the.seperator"
@@ -228,17 +231,17 @@ def cli(args, configs):
     configs['the']['help'] = '-h' in args or '--help' in args
     configs['the']['go'] = '-g' in args or '--go' in args
     configs['the']['quit'] = '-q' in args or '--quit' in args
-    configs['the']['bins'] = find_arg_value(arg_arr, '-b', '--bins', 16)
+    configs['the']['bins'] = float(find_arg_value(arg_arr, '-b', '--bins', 16))
     configs['the']['file'] = find_arg_value(arg_arr, '-f', '--file', '../../etc/data/auto93.csv')
-    configs['the']['cliffs'] = find_arg_value(arg_arr, '-c', '--cliffs', 0.147)
-    configs['the']['Far'] = find_arg_value(arg_arr, '-F', '--Far', 0.95)
-    configs['the']['Halves'] = find_arg_value(arg_arr, '-H', '--Halves', 512)
-    configs['the']['min'] = find_arg_value(arg_arr, '-m', '--min', 0.5)
-    configs['the']['Max'] = find_arg_value(arg_arr, '-M', '--Max', 512)
-    configs['the']['p'] = find_arg_value(arg_arr, '-p', '--p', 2)
-    configs['the']['rest'] = find_arg_value(arg_arr, '-r', '--rest', 4)
-    configs['the']['Reuse'] = find_arg_value(arg_arr, '-R', '--Reuse', True)
-    configs['the']['seed'] = find_arg_value(arg_arr, '-s', '--seed', 937162211)
+    configs['the']['cliffs'] = float(find_arg_value(arg_arr, '-c', '--cliffs', 0.147))
+    configs['the']['Far'] = float(find_arg_value(arg_arr, '-F', '--Far', 0.95))
+    configs['the']['Halves'] = float(find_arg_value(arg_arr, '-H', '--Halves', 512))
+    configs['the']['min'] = float(find_arg_value(arg_arr, '-m', '--min', 0.5))
+    configs['the']['Max'] = int(find_arg_value(arg_arr, '-M', '--Max', 512))
+    configs['the']['p'] = int(find_arg_value(arg_arr, '-p', '--p', 2))
+    configs['the']['rest'] = int(find_arg_value(arg_arr, '-r', '--rest', 4))
+    configs['the']['Reuse'] = bool(find_arg_value(arg_arr, '-R', '--Reuse', True))
+    configs['the']['seed'] = float(find_arg_value(arg_arr, '-s', '--seed', 937162211))
 
     return configs
 
@@ -273,9 +276,6 @@ def merge(col1, col2):# col is a num or a sym
         for i in range(count):
             col1_copy.add(item)
     
-    # col1_copy.set_lo(min(col1.lo, col2.lo))
-    # col1_copy.set_hi(max(col1.hi, col2.hi))
-
     return col1_copy
 
 def merge2(col1, col2): # col is a num or a sym

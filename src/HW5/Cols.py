@@ -51,3 +51,4 @@ class Cols:
     def add(self, row: Row):
         for col in self.all:
             col.add(row.cells[col.at])
+        self.all = sorted(self.all, key=lambda x: x.lo)

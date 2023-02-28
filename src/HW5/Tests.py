@@ -120,16 +120,17 @@ def eg_sym():
 ##
 @TestEngine.test
 def eg_num():
-    n = Num()
-    test_vals = [1,1,1,1,2,2,3]
-    for x in test_vals:
-        n.add(x)
+    num1 = Num()
+    num2 = Num()
 
-    mid, div = n.mid(), round(n.div(), 3)
-    results = "mid= {}, div= {}".format(mid, div)
-    canPrint(results, 'Should be able to print mid and div')
+    for i in range(10000):
+        num1.add(rand())
+    for i in range(10000):
+        num2.add(pow(rand(), 2))
 
-    return 11/7 == mid and 0.787 == div
+    mid = num1.mid()
+    mid2 = num2.mid()
+    return rnd(num1.mid(), 1) == 0.5 and num1.mid() > num2.mid()
 
 @TestEngine.test
 def eg_csv():
@@ -205,8 +206,6 @@ def show_tree(tree, level = None):
 
 @TestEngine.test 
 def test_cliffs():
-    resA = cliffs_delta([8,7,6,2,5,8,7,3],[8,7,6,2,5,8,7,3])
-    resB = cliffs_delta([8,7,6,2,5,8,7,3],[9,9,7,8,10,9,6])
     if cliffs_delta([8,7,6,2,5,8,7,3],[8,7,6,2,5,8,7,3]) or not cliffs_delta([8,7,6,2,5,8,7,3],[9,9,7,8,10,9,6]):
         return False
 

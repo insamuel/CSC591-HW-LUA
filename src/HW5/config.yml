@@ -1,9 +1,9 @@
 the:
   Far: 0.95
-  Halves: 512
+  Halves: 512.0
   Max: 512
   Reuse: true
-  bins: 16
+  bins: 16.0
   cliffs: 0.147
   dump: false
   eg: ALL
@@ -16,4 +16,4 @@ the:
   quit: false
   rest: 4
   sample: 512
-  seed: 937162211
+  seed: 937162211.0

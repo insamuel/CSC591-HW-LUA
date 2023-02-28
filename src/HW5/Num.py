@@ -1,5 +1,14 @@
 import math
 
+import Common
+
+import statistics
+
+from Utils import rand, per
+
+
+
+
 ##
 # Import the math class
 #
@@ -42,13 +51,12 @@ class Num():
 
         self.has = {}
         self.n = 0
-        self.mu = 0
-        self.m2 = 0
 
         self.lo = float('inf')
         self.hi = float('-inf')
 
         self.w = -1 if '-$' in col_name else 1
+
 
 
     ##
@@ -76,18 +84,37 @@ class Num():
     # hi is updated to be the maximum between the current value of hi and
     # the new value n.
     ##
+    # NUM's store the value in a finite sized cache. When it
+    # fills to more than the.Max, then at probability 
+    # the.Max/col.n replace any existing item
+    # (selected at random). If anything is added, the list
+    # may not longer be sorted so set `col.ok=false`.
     def add(self, value):
         if value != '?':
+            capacity = Common.cfg['the']['Max']
+            if self.n >= capacity:
+                random_victim = int(rand(1, len(self.has.keys()))) if rand() < capacity / self.n else None
+                if random_victim != None: # make room
+                    key = list(self.has.keys())[random_victim]
+                    removed_count = self.has[key]
+                    self.n-= removed_count
+                    if key == self.lo:
+                        sorted_asc = sorted(self.has.keys())
+                        self.lo = sorted_asc[0]
+                    if key == self.hi:
+                        sorted_asc = sorted(self.has.keys(), reverse=True)
+                        self.hi = sorted_asc[0]
+                    self.has.pop(key)
+                else: # if we didn't make room, just quit here
+                    return 
+
             float_value = float(value)
             if float_value in self.has:
                 self.has[float_value] = self.has[float_value] + 1
             else:
                 self.has[float_value] = 1
 
-            self.n = self.n + 1
-            d = float_value - self.mu
-            self.mu = self.mu + (d / self.n)
-            self.m2 = self.m2 + (d * (float_value - self.mu))
+            self.n+= 1
             self.lo = min(float_value, self.lo)
             self.hi = max(float_value, self.hi)
 
@@ -101,13 +128,14 @@ class Num():
     # Central tendency; for Nums, this is mean
     #
     # The mid method returns the current mean (average) of the data that
-    # has been processed till now, as denoted by the mu variable. mu is
-    # updated whenever new data is added to the class using the
-    # add method. By returning self.mu, the mid method provides a way for
-    # code that uses the Num class to access the current mean of the data.
+    # has been processed till now.
     ##
-    def mid(self):
-        return self.mu
+    def mid(self):  
+        total_sum = 0
+        for key, value in self.has.items():
+            total_sum+= key * value
+        return total_sum / self.n
+
 
     ##
     # Diversity; for Nums, this is standard deviation using Welford's alg
@@ -124,9 +152,18 @@ class Num():
     # - 1) using the math.pow function, and returns the result.
     ##
     def div(self):
-        if((self.m2 < 0) or (self.n < 2)):
+
+        # return pow((self.m2 / (self.n - 1)), 0.5)
+        # return (per(list(self.has.keys()), 0.9) - per(list(self.has.keys()), 0.1)) / 2.58
+        # running_list = []
+        # for key, value in self.has.items():
+        #     for i in range(value):
+        #         running_list.append(key)
+
+        if len(self.has.keys()) < 2:
             return 0
-        return pow((self.m2 / (self.n - 1)), 0.5)
+        res = statistics.stdev(self.has.keys())
+        return res
 
     ##
     # Checks if value is equal to "?". If it is, it returns value as is. If
@@ -177,5 +214,5 @@ class Num():
         return abs(n1 - n2)
 
     def to_string(self) -> str:
-        summary = '{NUM, at: ' + str(self.at) + ', hi: ' + str(self.hi) + ', lo: ' + str(self.lo) + ', m2: ' + str(self.m2) + ', mu: ' + str(self.mu) + ', n: ' + str(self.n) + ', txt: ' + self.txt + '}'
+        summary = '{NUM, at: ' + str(self.at) + ', hi: ' + str(self.hi) + ', lo: ' + str(self.lo) + ', n: ' + str(self.n) + ', txt: ' + self.txt + '}'
         return summary
