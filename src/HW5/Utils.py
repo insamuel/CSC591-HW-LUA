@@ -167,7 +167,7 @@ def cos(a, b, c):
     y = pow(abs((pow(a, 2) - pow(x2, 2))), 0.5)
     return {'x': x2, 'y': y}
 
-def per(t, p):
+def per(t, p = 0.5):
     p = math.floor((p * len(t)) + 0.5)
     return t[max(1, min(len(t), p)) - 1]
 

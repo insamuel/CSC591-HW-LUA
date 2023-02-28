@@ -259,9 +259,9 @@ class Data:
                         k = int(self.bin(col, x))
                         if k not in ranges:
                             ranges[k] = Sym(col.at, col.txt) if is_sym else Num(col.at, col.txt)
-                        
-                        if not is_sym and float(x) not in ranges[k].has.keys():
-                            ranges[k].add(x)
+                        ranges[k].add(x)
+                        # if not is_sym : #and float(x) not in ranges[k].has.keys()
+                        #     ranges[k].add(x)
 
             ranges = { key: value for key, value in sorted(ranges.items(), key=lambda x: x[1].lo) }
             

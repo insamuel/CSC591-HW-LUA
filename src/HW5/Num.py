@@ -2,7 +2,7 @@ import math
 
 import Common
 
-import statistics
+import numpy
 
 from Utils import rand, per
 
@@ -152,17 +152,14 @@ class Num():
     # - 1) using the math.pow function, and returns the result.
     ##
     def div(self):
-
-        # return pow((self.m2 / (self.n - 1)), 0.5)
-        # return (per(list(self.has.keys()), 0.9) - per(list(self.has.keys()), 0.1)) / 2.58
-        # running_list = []
-        # for key, value in self.has.items():
-        #     for i in range(value):
-        #         running_list.append(key)
-
         if len(self.has.keys()) < 2:
             return 0
-        res = statistics.stdev(self.has.keys())
+        running_list = []
+        for key, value in self.has.items():
+            for i in range(value):
+                running_list.append(key)
+                
+        res = (numpy.percentile(running_list, 90) - numpy.percentile(running_list, 10)) / 2.58
         return res
 
     ##
