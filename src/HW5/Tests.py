@@ -8,11 +8,9 @@ from Num import Num
 from Sym import Sym
 from Row import Row
 from Cols import Cols
-from Utils import rnd, canPrint, rand, set_seed, read_csv
+from Utils import rnd, canPrint, rand, set_seed, read_csv, cliffs_delta, get_value
 
 command_line_args = []
-
-
 
 ##
 # Imports sys, TestEngine, Common, Num from Num, Sym from Sym, rnd,
@@ -122,16 +120,17 @@ def eg_sym():
 ##
 @TestEngine.test
 def eg_num():
-    n = Num()
-    test_vals = [1,1,1,1,2,2,3]
-    for x in test_vals:
-        n.add(x)
+    num1 = Num()
+    num2 = Num()
 
-    mid, div = n.mid(), round(n.div(), 3)
-    results = "mid= {}, div= {}".format(mid, div)
-    canPrint(results, 'Should be able to print mid and div')
+    for i in range(10000):
+        num1.add(rand())
+    for i in range(10000):
+        num2.add(pow(rand(), 2))
 
-    return 11/7 == mid and 0.787 == div
+    mid = num1.mid()
+    mid2 = num2.mid()
+    return rnd(num1.mid(), 1) == 0.5 and num1.mid() > num2.mid()
 
 @TestEngine.test
 def eg_csv():
@@ -174,96 +173,114 @@ def test_data():
     print(res_string)
     return res_string == expected_output
 
-#@TestEngine.test
-def test_sort_nearest_neighbor():
-    data = Data('../../etc/data/auto93.csv')
-    around_res = data.around(data.rows[0])
 
-    expected_output = "0\t0.0\t['8', '304.0', '193', '4732', '18.5', '70', '1', '10']\n50\t0.17\t['8', '318', '150', '4457', '13.5', '74', '1', '10']\n100\t0.28\t['6', '232', '100', '2901', '16', '74', '1', '20']\n150\t0.38\t['8', '351', '142', '4054', '14.3', '79', '1', '20']\n200\t0.55\t['4', '122', '96', '2300', '15.5', '77', '1', '30']\n250\t0.68\t['4', '119', '82', '2720', '19.4', '82', '1', '30']\n300\t0.71\t['4', '119', '97', '2545', '17', '75', '3', '20']\n350\t0.79\t['4', '146', '67', '3250', '21.8', '80', '2', '30']\n"
-    res_string = ""
-    for i in range(len(around_res)):
-        if i % 50 == 0:
-            row = around_res[max(0, i -1)]
-            dist = rnd(data.dist(row, data.rows[0]), 2)
-            res_string+= str(i) + "\t" + str(dist) + '\t' + str(row.cells) + '\n'
-    print(res_string)
-    return expected_output == res_string
-
-#@TestEngine.test
-def test_one_level_bi_clustering():
-    data = Data('../../etc/data/auto93.csv')
-    set_seed(937162211)
-    half_res = data.half()
-    res_string = str(len(half_res['left'])) + '\t' + str(len(half_res['right'])) + '\t' + str(len(data.rows)) + '\n'
-    res_string += str(half_res['A'].cells) + '\t' + str(half_res['c']) + '\n'
-    res_string+= str(half_res['mid'].cells) + '\n'
-    res_string+= str(half_res['B'].cells) + '\n'
-    print(res_string)
-
-    #TODO this answer *seems* correct. we use a different random number generator so our A and B values are different. 
-    # will probably need more confirmation as the project goes on
-    expected_res = "199\t199\t398\n['4', '90', '48', '1985', '21.5', '78', '2', '40']\t0.6393183441778267\n['4', '151', '90', '2950', '17.3', '82', '1', '30']\n['6', '232', '100', '2634', '13', '71', '1', '20']\n"
-    return res_string == expected_res
-
-def show_hw3(cluster_res, cols, n_places, level):
+def show_cluster(cluster_res, cols, n_places, level):
     if cluster_res != None:
-        report_string = ('| '*level)
+        report_string = ('|.. '*level)
 
         data = cluster_res['data']
 
-        report_string+= ' ' + str(len(data.rows))
-        if 'left' not in cluster_res or level == 0:
-            report_string+= ' { '
-            for y in data.cols.y:
-                report_string+= ' :' + y.txt + ' ' + str(y.rnd(y.mid(), n_places))
-            report_string+= ' }'
-        print(report_string)
-
-        show(cluster_res['left'] if 'left' in cluster_res else None, cols, n_places, level + 1)
-        show(cluster_res['right'] if 'right' in cluster_res else None, cols, n_places, level + 1)
-
-def show_hw4(cluster_res, cols, n_places, level):
-    if cluster_res != None:
-        report_string = ('| '*level)
-
-        data = cluster_res['data']
-
-        report_string+= ' ' + str(len(data.rows))
         if 'left' not in cluster_res:
-            report_string+= ' { ' + str(data.rows[-1].cells[-1])
+            report_string+=  str(data.rows[-1].cells[-1])
         else:
-            report_string+= ' { ' + str(rnd(100 * cluster_res['c']))
-        report_string+= ' }'
+            print_val = rnd(100 * cluster_res['c'])
+            report_string+=  str(rnd(100 * cluster_res['c']))
         print(report_string)
 
-        show_hw4(cluster_res['left'] if 'left' in cluster_res else None, cols, n_places, level + 1)
-        show_hw4(cluster_res['right'] if 'right' in cluster_res else None, cols, n_places, level + 1)
+        show_cluster(cluster_res['left'] if 'left' in cluster_res else None, cols, n_places, level + 1)
+        show_cluster(cluster_res['right'] if 'right' in cluster_res else None, cols, n_places, level + 1)
 
+def show_tree(tree, level = None):
+    if tree != None:
+        level = level if level != None else 0
+        report_string = ('|.. '*level)
+        data = tree['data']
+        report_string+= str(len(data.rows))
 
-#@TestEngine.test
-def test_cluster():
-    data = Data('../../etc/data/auto93.csv')
+        if level == 0 or 'left' not in tree:
+            report_string+= '   ' + str(data.stats())
+            
+        print(report_string)
+        show_tree(tree['left'] if 'left' in tree else None, level + 1)
+        show_tree(tree['right'] if 'right' in tree else None, level + 1)
 
-    show_hw3(data.cluster(), data.cols.y, 1, 0)
+@TestEngine.test 
+def test_cliffs():
+    if cliffs_delta([8,7,6,2,5,8,7,3],[8,7,6,2,5,8,7,3]) or not cliffs_delta([8,7,6,2,5,8,7,3],[9,9,7,8,10,9,6]):
+        return False
 
-    #TODO check if this is actually working (randomness changes output from what dr. menzies has)
+    t1, t2 = [], []
+    for i in range(1000):
+        t1.append(rand())
+        t2.append(pow(rand(), 0.5))
+    
+    if cliffs_delta(t1, t1) or not cliffs_delta(t1, t2):
+        return False
+
+    diff, j = False, 1.0
+    while not diff:
+        t3 = list(map(lambda x: x * j, t1))
+        diff = cliffs_delta(t1, t3)
+        print('> ' + str(rnd(j)) + ' ' + str(diff))
+        j*= 1.025
+
     return True
 
-#@TestEngine.test
-def test_sway():
+@TestEngine.test 
+def test_dist():
     data = Data('../../etc/data/auto93.csv')
-    show_hw3(data.sway(), data.cols.y, 1, 0)
+    num = Num()
+    num.txt = "test_dist Num"
+    for i, row in enumerate(data.rows):
+        num.add(data.dist(row, data.rows[1]))
 
-    #TODO check if this is actually working (randomness changes output from what dr. menzies has)
+    print(num.to_string()) #i have no idea if this is right. i can't find the expected output on menzie's repo
     return True
 
 @TestEngine.test
-def test_repcols():
-    generated_data = Repgrid.process_repgrid_file('../../etc/data/repgrid1.csv')
-    show_hw4(generated_data.cluster(), generated_data.cols.y, 1, 0)
+def test_half():
+    data = Data('../../etc/data/auto93.csv')
+    half_res = data.half()
+    print(str(len(half_res['left'])) + ", " + str(len(half_res['right'])))
 
-    #TODO check if this is actually working (randomness changes output from what dr. menzies has)
+    left, right = data.clone(half_res['left']), data.clone(half_res['right'])
+    print(left.stats())
+    print(right.stats())
+    return True #todo (km) check these are correct
+
+@TestEngine.test
+def test_tree():
+    data = Data('../../etc/data/auto93.csv')
+    show_tree(data.tree(), 0) 
     return True
+
+@TestEngine.test
+def test_sway():
+    data = Data('../../etc/data/auto93.csv')
+    sway_res = data.sway()
+    print('all: ' + str(data.stats()))
+    print('best: ' + str(sway_res['best'].stats()))
+    print('rest: ' + str(sway_res['rest'].stats()))
+    return True # todo (km) check if these are correct
+
+@TestEngine.test
+def test_bin():
+    data = Data('../../etc/data/auto93.csv')
+    sway_res = data.sway()
+
+    print('[all] best: ' + str(len(sway_res['best'].rows)) + ', rest: ' + str(len(sway_res['rest'].rows)))
+    b4 = None
+    for bin_res in data.bins(data.cols.x, sway_res):
+        for range in bin_res:
+            if range.txt != b4:
+                print('')
+            b4 = range.txt
+            #val = get_value(range.has, len(sway_res['best'].rows), len(sway_res['rest'].rows), "best")
+            print('{ ' + range.txt + ', ' + str(range.lo) + ', ' + str(range.hi) + '}')
+
+    return False
+
+
 
 ##
 # Defines a function ALL using @TestEngine.test. This function calls other

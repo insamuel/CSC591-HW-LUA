@@ -1,4 +1,10 @@
 the:
+  Far: 0.95
+  Halves: 512.0
+  Max: 512
+  Reuse: true
+  bins: 16.0
+  cliffs: 0.147
   dump: false
   eg: ALL
   far: 0.95
@@ -8,5 +14,6 @@ the:
   min: 0.5
   p: 2
   quit: false
+  rest: 4
   sample: 512
-  seed: 937162211
+  seed: 937162211.0

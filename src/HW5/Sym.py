@@ -38,6 +38,18 @@ class Sym():
         self.most = 0
         self.mode = None
 
+        #todo (km) not sure if this is the right thing to do
+        self.lo = float('inf')
+        self.hi = float('-inf')
+
+
+    def set_lo(self, x: float):
+        self.lo = x
+        self.hi = x
+
+    def set_hi(self, x: float):
+        self.lo = x
+        self.hi = x
     ##
     # Add symbol value to Sym object
     #
@@ -59,7 +71,6 @@ class Sym():
             if self.has[x] > self.most:
                 self.most = self.has[x]
                 self.mode = x
-
 
     ##
     # Calculates the mode, most common symbol

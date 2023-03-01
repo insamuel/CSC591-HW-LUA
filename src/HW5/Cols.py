@@ -25,15 +25,30 @@ class Cols:
     # x:        A list of independent columns.
     # y:        A list of dependent columns.
     ##
-    def __init__(n, s):
+    def __init__(self, t: list[str]):
+        self.names = t
+        self.all = []
+        self.x = []
+        self.y = []
 
-        if re.match('^[A-Z]', s) != None:
-            col = Num(n, s)
-        else:
-            col = Sym(n, s)
+        for n, s in enumerate(t):
+            col = Num(n, s) if re.search("^[A-Z]+", s) != None else Sym(n, s)
+            self.all.append(col)
+            if(s[-1].lower() != 'x'):
+                if re.search("X$", s) is None:
+                    if(re.search("[!+-]$", s)):
+                        self.y.append(col)
+                    else:
+                        self.x.append(col)
+            
 
-        col.isIgnored   = bool(re.search('X$', col.txt))
-        col.isKlass     = bool(re.search('!$', col.txt))
-        col.isGoal      = bool(re.search('[!+-]$', col.txt))
-
-        return col
+    ##
+    # The add method updates the dependent and independent columns with
+    # details from a given row. It does this by iterating over the x and y
+    # lists and calling the add method for each column, passing in the
+    # relevant cell from the row.cells list.
+    ##
+    def add(self, row: Row):
+        for col in self.all:
+            col.add(row.cells[col.at])
+        self.all = sorted(self.all, key=lambda x: x.lo)
