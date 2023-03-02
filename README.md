@@ -12,7 +12,7 @@ Group Members: Isabella Samuelsson, Rithik Jain, Katherine Mitchell
 
 # About
 
-Repository for all homeworks for CSC591.
+Repository for all homeworks for CSC591. Output files are located in \etc\out
 
 - To run HW1, navigate to \src\HW1 and run 'python script.py'. HW1 tests are contained in \src\HW1 and can be run all together by 'python Tests.py'.
 
