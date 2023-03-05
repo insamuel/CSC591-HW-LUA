@@ -24,6 +24,8 @@ Repository for all homeworks for CSC591. Output files are located in \etc\out
 
 - HW5: IN PROGRESS
 
+- HW6: IN PROGRESS
+
 
 
 
