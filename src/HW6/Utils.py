@@ -345,3 +345,25 @@ def get_value(has, nB = 1, nR = 1, goal = "True"):
 ##
 def set_seed(x):
     configs['the']['seed'] = x
+
+##
+# Create a  RULE that groups `ranges` by their column id.
+# Each group is a disjunction of its contents (and sets of groups are conjunctions).
+#
+# Takes a list of ranges, a maximum size maxSize, and returns a pruned version of the ranges based on
+# their column id.
+#
+# Creates an empty dictionary t. For each range in the input list, checks if there is an existing key
+# in the dictionary t corresponding to the column id (range.txt). If the key doesn't exist, a new empty
+# list is created for that key. Range is then added to that list as a dictionary with keys 'lo', 'hi'
+# and 'at'.
+#
+# Prune function is called with the dictionary, t and maximum siz, maxSize.
+##
+def RULE(ranges, maxSize):
+    t = {}
+    for range in ranges:
+        if range.txt not in t:
+            t[range.txt] = []
+        t[range.txt].append({'lo': range.lo, 'hi': range.hi, 'at': range.at})
+    return prune(t, maxSize)
