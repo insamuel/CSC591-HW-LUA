@@ -367,3 +367,26 @@ def RULE(ranges, maxSize):
             t[range.txt] = []
         t[range.txt].append({'lo': range.lo, 'hi': range.hi, 'at': range.at})
     return prune(t, maxSize)
+
+##
+# Takes a dictionary rule, a dictionary maxSize, and returns a pruned version of rule based on the
+# values in maxSize.
+#
+# Initializes variable n to 0. For each key-value pair txt, ranges in input dictionary rule:
+#   increment n by 1
+#   length of ranges list = maxSize[txt], increments n by 1 again and set the key-value pair with
+#   key txt from rule to nil/none.
+#
+# After processing all key-value pairs in rule, if:
+#   n > 0, pruned rule is returned
+#   n = 0, returns None
+##
+def prune(rule, maxSize):
+    n = 0
+    for txt, ranges in rule:
+        n += 1
+        if len(ranges) == maxSize[txt]:
+            n += 1
+            rule[txt] = None
+    if n > 0:
+        return rule
