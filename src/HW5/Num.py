@@ -99,7 +99,7 @@ class Num():
                 random_victim = int(rand(0, len(self.has.keys()))) if rand_value < capacity / self.n else None
                 if random_victim != None: # make room
                     key = list(self.has.keys())[random_victim]
-                    #removed_count = self.has[key]
+                    
                     self.n-= 1
                     if key == self.lo:
                         sorted_asc = sorted(self.has.keys())
@@ -107,8 +107,11 @@ class Num():
                     if key == self.hi:
                         sorted_asc = sorted(self.has.keys(), reverse=True)
                         self.hi = sorted_asc[0]
-                    #self.has.pop(key)
                     self.has[key]-= 1
+                    
+                    if self.has[key] <= 0:
+                        self.has.pop(key)
+
                 else: # if we didn't make room, just quit here
                     return 
 

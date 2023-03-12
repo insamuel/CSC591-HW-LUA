@@ -338,19 +338,6 @@ def merge_any(ranges0): #ranges0: sorted lists of ranges (nums)
     
     return get_no_gaps_ranges(ranges0) if len(ranges0) == len(ranges1) else merge_any(ranges1)
 
-
-def get_value(has, nB = 1, nR = 1, goal = "True"):
-    b = 0
-    r = 0
-    for x, n in has.items():
-        if x == goal:
-            b+= n
-        else:
-            r+= n
-    b = b / (nB + 1 / float('inf'))
-    r = r / (nR + 1 / float('inf'))
-    return pow(b, 2) / (b + r)
-
 ##
 # Function sets the value of seed in the dictionary configs['the'] to x.
 # The configs dictionary holds the configuration data and the seed key in

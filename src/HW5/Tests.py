@@ -8,7 +8,7 @@ from Num import Num
 from Sym import Sym
 from Row import Row
 from Cols import Cols
-from Utils import rnd, canPrint, rand, set_seed, read_csv, cliffs_delta, get_value
+from Utils import rnd, canPrint, rand, set_seed, read_csv, cliffs_delta
 
 command_line_args = []
 
@@ -261,7 +261,7 @@ def test_sway():
     print('all: ' + str(data.stats()))
     print('best: ' + str(sway_res['best'].stats()))
     print('rest: ' + str(sway_res['rest'].stats()))
-    return True # todo (km) check if these are correct
+    return True
 
 @TestEngine.test
 def test_bin():

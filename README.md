@@ -22,7 +22,7 @@ Repository for all homeworks for CSC591. Output files are located in \etc\out
 
 - To run HW4, navigate to \src\HW4 and run 'python grid.py'. HW4 tests are contained in \src\HW4 and can be run all together by 'python Tests.py'.
 
-- HW5: IN PROGRESS
+- To run HW5, navigate to \src\HW5 and run 'python bins.py'. HW5 tests are contained in \src\HW5 and can be run all together by 'python Tests.py'.
 
 - HW6: IN PROGRESS
 

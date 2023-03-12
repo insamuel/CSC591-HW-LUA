@@ -198,8 +198,6 @@ def test_one_level_bi_clustering():
     res_string+= str(half_res['B'].cells) + '\n'
     print(res_string)
 
-    #TODO this answer *seems* correct. we use a different random number generator so our A and B values are different. 
-    # will probably need more confirmation as the project goes on
     expected_res = "199\t199\t398\n['4', '90', '48', '1985', '21.5', '78', '2', '40']\t0.6393183441778267\n['4', '151', '90', '2950', '17.3', '82', '1', '30']\n['6', '232', '100', '2634', '13', '71', '1', '20']\n"
     return res_string == expected_res
 
@@ -227,7 +225,6 @@ def test_cluster():
 
     show(data.cluster(), data.cols.y, 1, 0)
 
-    #TODO check if this is actually working (check if randomness effects output)
     return True
 
 @TestEngine.test
@@ -235,7 +232,6 @@ def test_sway():
     data = Data('../../etc/data/auto93.csv')
     show(data.sway(), data.cols.y, 1, 0)
 
-    #TODO check if this is actually working (check if randomness effects output)
     return True
 
 ##
