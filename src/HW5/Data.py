@@ -250,7 +250,6 @@ class Data:
         for col in cols: #Col objects
             ranges = {}
             is_sym = type(col) == Sym
-
             names = {}
             for name, data in rows_set.items(): #this will go over best, rest groups (lists of Rows)
                 for row in data.rows:
@@ -259,9 +258,7 @@ class Data:
                         k = int(self.bin(col, x))
                         if k not in ranges:
                             ranges[k] = Sym(col.at, col.txt) if is_sym else Num(col.at, col.txt)
-                        ranges[k].add(x)
-                        # if not is_sym : #and float(x) not in ranges[k].has.keys()
-                        #     ranges[k].add(x)
+                        ranges[k].add(x, name)
 
             ranges = { key: value for key, value in sorted(ranges.items(), key=lambda x: x[1].lo) }
             
