@@ -8,7 +8,7 @@ from Num import Num
 from Sym import Sym
 from Row import Row
 from Cols import Cols
-from Utils import rnd, canPrint, rand, set_seed, read_csv, cliffs_delta, get_value
+from Utils import rnd, canPrint, rand, set_seed, read_csv, cliffs_delta
 
 command_line_args = []
 
@@ -261,7 +261,7 @@ def test_sway():
     print('all: ' + str(data.stats()))
     print('best: ' + str(sway_res['best'].stats()))
     print('rest: ' + str(sway_res['rest'].stats()))
-    return True # todo (km) check if these are correct
+    return True
 
 @TestEngine.test
 def test_bin():
@@ -275,11 +275,24 @@ def test_bin():
             if range.txt != b4:
                 print('')
             b4 = range.txt
-            #val = get_value(range.has, len(sway_res['best'].rows), len(sway_res['rest'].rows), "best")
-            print('{ ' + range.txt + ', ' + str(range.lo) + ', ' + str(range.hi) + '}')
+            has = range.sources.has
+            best_ratio = (has['best'] if 'best' in has else 0) / range.sources.n
+            print(range.txt + ', ' + str(range.lo) + ', ' + str(range.hi) + ', ' + str(rnd(best_ratio)) + ', ' + str(range.sources.has))
 
-    return False
+    return True
 
+@TestEngine.test
+def test_resrvoir_sampling():
+    current_max = Common.cfg['the']['Max']
+    Common.cfg['the']['Max'] = 32
+
+    num1 = Num()
+    for i in range(10000):
+        num1.add(i)
+
+
+    Common.cfg['the']['Max'] = current_max #undo that change
+    return len(num1.has) == 32
 
 
 ##

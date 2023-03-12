@@ -275,11 +275,22 @@ def merge(col1, col2):# col is a num or a sym
     for item, count in col2.has.items():
         for i in range(count):
             col1_copy.add(item)
+            
+    for item, count in col2.sources.has.items():
+        for i in range(count):
+            col1_copy.sources.add(item)
     
     return col1_copy
 
-def merge2(col1, col2): # col is a num or a sym
+def merge2(col1, col2):
     merged = merge(col1, col2)
+    mdiv = merged.div()
+    c1div = col1.div()
+    c1res = (col1.div() * col1.n)
+
+    c2div = col2.div()
+    c2res = (col2.div() * col2.n)
+    res = (((col1.div() * col1.n) + (col2.div() * col2.n)) / merged.n)
     if merged.div() <= (((col1.div() * col1.n) + (col2.div() * col2.n)) / merged.n):
         return merged
     return None
@@ -290,6 +301,7 @@ class Range():
         self.txt = txt
         self.lo = lo
         self.hi = hi
+        self.sources = {}
 
 
 def merge_any(ranges0): #ranges0: sorted lists of ranges (nums)
@@ -301,6 +313,7 @@ def merge_any(ranges0): #ranges0: sorted lists of ranges (nums)
             out_list[j].txt = t[j].txt
             out_list[j].lo = t[j].lo
             out_list[j].hi = t[j].hi
+            out_list[j].sources = t[j].sources
 
         for j in range(1, col_count): # shift things
             out_list[j].lo = t[j - 1].hi
@@ -315,27 +328,15 @@ def merge_any(ranges0): #ranges0: sorted lists of ranges (nums)
         to_add = left
         right = ranges0[j + 1] if (j + 1) < len(ranges0) else None
         if right != None:
-            y = merge2(left, right)
+            y = merge2(left.sources, right.sources)
             if y != None:
                 j+= 1
-                to_add = y
+                to_add = merge(left, right)
+
         ranges1.append(to_add)
         j+= 1
     
     return get_no_gaps_ranges(ranges0) if len(ranges0) == len(ranges1) else merge_any(ranges1)
-
-
-def get_value(has, nB = 1, nR = 1, goal = "True"):
-    b = 0
-    r = 0
-    for x, n in has.items():
-        if x == goal:
-            b+= n
-        else:
-            r+= n
-    b = b / (nB + 1 / float('inf'))
-    r = r / (nR + 1 / float('inf'))
-    return pow(b, 2) / (b + r)
 
 ##
 # Function sets the value of seed in the dictionary configs['the'] to x.

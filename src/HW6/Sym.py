@@ -38,7 +38,6 @@ class Sym():
         self.most = 0
         self.mode = None
 
-        #todo (km) not sure if this is the right thing to do
         self.lo = float('inf')
         self.hi = float('-inf')
 
