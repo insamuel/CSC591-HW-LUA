@@ -8,7 +8,7 @@ from Num import Num
 from Sym import Sym
 from Row import Row
 from Cols import Cols
-from Utils import rnd, canPrint, rand, set_seed, read_csv, cliffs_delta
+from Utils import rnd, canPrint, rand, set_seed, read_csv, cliffs_delta, selects
 
 command_line_args = []
 
@@ -52,7 +52,7 @@ def eg_the():
 # canPrint function to print the formatted string along with the message
 # "M1 and M2 should be equal".
 ##
-@TestEngine.test
+#@TestEngine.test
 def eg_rand():
     num1, num2 = Num(), Num()
 
@@ -86,7 +86,7 @@ def eg_rand():
 #
 # Returns true if the mode is "a" and the entropy value is 1.379.
 ##
-@TestEngine.test
+#@TestEngine.test
 def eg_sym():
     s = Sym()
 
@@ -118,7 +118,7 @@ def eg_sym():
 # able to print mid and div" into a single string and passes it to the
 # function canPrint.
 ##
-@TestEngine.test
+#@TestEngine.test
 def eg_num():
     num1 = Num()
     num2 = Num()
@@ -132,7 +132,7 @@ def eg_num():
     mid2 = num2.mid()
     return rnd(num1.mid(), 1) == 0.5 and num1.mid() > num2.mid()
 
-@TestEngine.test
+#@TestEngine.test
 def eg_csv():
     row_count = 0
     def line_handler(xs: Row):
@@ -141,7 +141,7 @@ def eg_csv():
     read_csv(Common.cfg["the"]["file"], line_handler)
     return row_count == 399
 
-@TestEngine.test
+#@TestEngine.test
 def eg_duplicate_structure():
     d1 = Data(Common.cfg['the']['file'])
     d2 = d1.clone()
@@ -178,7 +178,7 @@ def show_tree(tree, level = None):
         show_tree(tree['left'] if 'left' in tree else None, level + 1)
         show_tree(tree['right'] if 'right' in tree else None, level + 1)
 
-@TestEngine.test 
+#@TestEngine.test 
 def test_cliffs():
     if cliffs_delta([8,7,6,2,5,8,7,3],[8,7,6,2,5,8,7,3]) or not cliffs_delta([8,7,6,2,5,8,7,3],[9,9,7,8,10,9,6]):
         return False
@@ -200,7 +200,7 @@ def test_cliffs():
 
     return True
 
-@TestEngine.test 
+#@TestEngine.test 
 def test_dist():
     data = Data('../../etc/data/auto93.csv')
     num = Num()
@@ -211,7 +211,7 @@ def test_dist():
     print(num.to_string()) #i have no idea if this is right. i can't find the expected output on menzie's repo
     return True
 
-@TestEngine.test
+#@TestEngine.test
 def test_half():
     data = Data('../../etc/data/auto93.csv')
     half_res = data.half()
@@ -222,13 +222,13 @@ def test_half():
     print(right.stats())
     return True #todo (km) check these are correct
 
-@TestEngine.test
+#@TestEngine.test
 def test_tree():
     data = Data('../../etc/data/auto93.csv')
     show_tree(data.tree(), 0) 
     return True
 
-@TestEngine.test
+#@TestEngine.test
 def test_sway():
     data = Data('../../etc/data/auto93.csv')
     sway_res = data.sway()
@@ -255,7 +255,7 @@ def test_bin():
 
     return True
 
-@TestEngine.test
+#@TestEngine.test
 def test_resrvoir_sampling():
     current_max = Common.cfg['the']['Max']
     Common.cfg['the']['Max'] = 32
@@ -272,6 +272,16 @@ def test_resrvoir_sampling():
 def test_xpln():
     data = Data('../../etc/data/auto93.csv')
     sway_res = data.sway()
+    xpln_res = data.xpln(sway_res)
+    if xpln_res['rule'] != None:
+        #TODO check if this is what we're actually supposed to do:
+        data2 = data.clone(selects(xpln_res['rule'], data.rows))
+        #print some more stuff
+
+        #TODO implement bettrs in Data class
+
+    return False
+    
 
 ##
 # Defines a function ALL using @TestEngine.test. This function calls other

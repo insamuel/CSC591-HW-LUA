@@ -40,6 +40,7 @@ with open(YAMLFILE, "r") as config_file:
 help_string = """USAGE: xpln.py [OPTIONS] [-g ACTION] \n OPTIONS:\n"
       "-b  --bins       initial number of bins           = 16\n"
       "-c  --cliffs     cliff's delta threshold          = 0.147\n"
+      "-d  --d          different is over sd*d           = 0.35\n"
       "-f   --file      name of file                     = ../../etc/data/auto93.cs\n"
       "-F   --Far       distance to \"faraway\"          = .95\n"
       "-g  --go         start-up action                  = run all tests\n"

@@ -5,6 +5,7 @@ the:
   Reuse: true
   bins: 16.0
   cliffs: 0.147
+  d: 0.35
   dump: false
   eg: ALL
   far: 0.95

@@ -230,6 +230,7 @@ def cli(args, configs):
     configs['the']['quit'] = '-q' in args or '--quit' in args
     configs['the']['bins'] = float(find_arg_value(arg_arr, '-b', '--bins', 16))
     configs['the']['file'] = find_arg_value(arg_arr, '-f', '--file', '../../etc/data/auto93.csv')
+    configs['the']['d'] = float(find_arg_value(arg_arr, '-d', '--d', 0.35))
     configs['the']['cliffs'] = float(find_arg_value(arg_arr, '-c', '--cliffs', 0.147))
     configs['the']['Far'] = float(find_arg_value(arg_arr, '-F', '--Far', 0.95))
     configs['the']['Halves'] = float(find_arg_value(arg_arr, '-H', '--Halves', 512))
@@ -279,9 +280,17 @@ def merge(col1, col2):# col is a num or a sym
     
     return col1_copy
 
-def merge2(col1, col2):
+# If (1) the parts are too small or
+# (2) the whole is as good (or simpler) than the parts,
+# then return the merge.
+def merged(col1, col2, nSmall = None, nFar = None):
     merged = merge(col1, col2)
     
+    if nSmall and col1.n < nSmall or col2.n < nSmall:
+        return merged
+    if nFar and type(col1) != Sym and abs(col1.mid() - col2.mid()) < nFar:
+        return merged
+
     if merged.div() <= (((col1.div() * col1.n) + (col2.div() * col2.n)) / merged.n):
         return merged
     return None
@@ -296,13 +305,12 @@ class Range():
         self.sources = {}
 
 
-def merge_any(ranges0): #ranges0: sorted lists of ranges (nums)
+def merges(ranges0, nSmall, nFar): #ranges0: sorted lists of ranges (nums)
 
     def get_no_gaps_ranges(t):
         col_count = len(t)
         out_list = [Range() for i in range(col_count)]
         for j in range(col_count): # copy over the txt, high, and lo values
-            out_list[j].at = t[j].at
             out_list[j].txt = t[j].txt
             out_list[j].lo = t[j].lo
             out_list[j].hi = t[j].hi
@@ -321,15 +329,16 @@ def merge_any(ranges0): #ranges0: sorted lists of ranges (nums)
         to_add = left
         right = ranges0[j + 1] if (j + 1) < len(ranges0) else None
         if right != None:
-            y = merge2(left.sources, right.sources)
+            y = merged(left.sources, right.sources, nSmall, nFar)
             if y != None:
                 j+= 1
                 to_add = merge(left, right)
+                
 
         ranges1.append(to_add)
         j+= 1
     
-    return get_no_gaps_ranges(ranges0) if len(ranges0) == len(ranges1) else merge_any(ranges1)
+    return get_no_gaps_ranges(ranges0) if len(ranges0) == len(ranges1) else merges(ranges1, nSmall, nFar)
 
 ##
 # Function sets the value of seed in the dictionary configs['the'] to x.
@@ -343,32 +352,36 @@ def set_seed(x):
 # A query that returns the score a distribution of symbols inside a SYM.
 # Sorts the ranges (has) by how well the select for <best> using 
 # (probability * support) = (b^2) / (b + r)
-def value(has, nB = 1, nR = 1, sGoal = True):
+def value(has, sGoal: str, nB = 1, nR = 1):
     b = 0
     r = 0
-    for x, n in has:
+    for x in has:
+        goal_len = has[x]
         if x == sGoal:
-            b+= n
+            b+= goal_len
         else:
-            r+= n
-    b = b / ((nB + 1) / sys.float_info.max)
-    r = r / ((nR + 1) / sys.float_info.max) #handling zero divide errors
+            r+= goal_len
+    b = b / (nB + 1 / sys.float_info.max)
+    r = r / (nR + 1 / sys.float_info.max) #handling zero divide errors
     return (b**2) / (b + r)
 
 def selects(rule, rows):
     def disjunction(ranges, row):
-        for i, range in ranges:
-            lo = range.lo
-            hi = range.hi
-            at = range.at
+        for range in ranges:
+            lo = range['lo']
+            hi = range['hi']
+            at = range['at']
             x = row.cells[at]
-            if(x == '?' or (lo == hi and lo == x) or (lo <= x and x < hi)):
+            if x == '?':
+                return True
+            float_x = float(x)
+            if(lo == hi and lo == float_x) or (lo <= float_x and float_x < hi):
                 return True
         return False
     
     def conjunction(row):
-        for i, ranges in rule:
-            if not disjunction(ranges, row):
+        for i, ranges in rule.items():
+            if ranges is None or not disjunction(ranges, row):
                 return False
         return True
     
@@ -395,13 +408,14 @@ def selects(rule, rows):
 #
 # Prune function is called with the dictionary, t and maximum siz, maxSize.
 ##
-def Rule(ranges, maxSize):
+def Rule(ranges, maxSizes):
     t = {}
-    for range in ranges:
+    for item in ranges:
+        range = item['range']
         if range.txt not in t:
             t[range.txt] = []
         t[range.txt].append({'lo': range.lo, 'hi': range.hi, 'at': range.at})
-    return prune(t, maxSize)
+    return prune(t, maxSizes)
 
 ##
 # Takes a dictionary rule, a dictionary maxSize, and returns a pruned version of rule based on the
@@ -416,14 +430,34 @@ def Rule(ranges, maxSize):
 #   n > 0, pruned rule is returned
 #   n = 0, returns None
 ##
-def prune(rule, maxSize):
+def prune(rule, maxSizes):
     n = 0
-    for txt, ranges in rule:
+    for txt, ranges in rule.items():
         n += 1
-        if len(ranges) == maxSize[txt]:
+        if len(ranges) == maxSizes[txt]:
             n += 1
             rule[txt] = None
     if n > 0:
         return rule
     
+def first_N(sortedRanges, scoreFunction):
+    print('')
+    # ?: for each item in sorted ranges, print txt, lo, hi, etc
 
+    first = sortedRanges[0]
+    # def useful(range):
+
+    #iterate through sortedRanges, determine which are useful
+    useful_ranges = sortedRanges
+
+    most = -1
+    out_rule = None
+
+    for n in range(len(useful_ranges)):
+        for i in range(n):
+            score_res = scoreFunction(useful_ranges[0:i])
+            if score_res != None:
+                if score_res['value'] > most:
+                    out_rule = score_res['rule']
+                    most = score_res['value']
+    return {'rule': out_rule, 'most': most}

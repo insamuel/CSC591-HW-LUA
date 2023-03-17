@@ -11,7 +11,7 @@ from Cols import Cols
 from Row import Row
 from Sym import Sym
 from Num import Num
-from Utils import read_csv, rand, cos, many, kap, merge_any, value, selects, Rule
+from Utils import read_csv, rand, cos, many, kap, merges, value, selects, Rule, first_N
 
 with open("config.yml", 'r') as config_file:
     cfg = yaml.safe_load(config_file)
@@ -93,6 +93,9 @@ class Data:
             s2 = s2 - math.exp(col.w * ((y-x)/len(ys)))
 
         return (s1/len(ys)) < (s2/len(ys))
+    
+    # def betters(self, n):
+
 
     ##
     # Defines a function "dist" that calculates the distance between two
@@ -262,8 +265,33 @@ class Data:
         res = 1 if (col.hi == col.lo) else (math.floor(float(x) / tmp + 0.5) * tmp)
         return res
 
-    def bins(self, cols, rows_set): #rows_set = best, rest result from sway
+    def bins(self, cols, rows_set): #rows_set = best, rest result from sway 
+
+        # def with_all_rows(col):
+            
+        #     ranges = {}
+        #     n = 0
+
+        #     def xy(x, y):
+        #         if x != '?':
+        #             n+= 1
+        #             k = int(self.bin(col, x))
+        #             if k not in ranges:
+        #                 ranges[k] = Sym(col.at, col.txt) if is_sym else Num(col.at, col.txt)
+        #             ranges[k].add(x, name)
+
+        #     for name, data in rows_set.items():
+        #         for row in data.rows:
+        #             xy(row[col.at], name)
+           
+        #     return {'n': n, 'to_add': to_add}
+
+
+        # def with1Col(col):
+        #     all_rows_res = with_all_rows(col)
+            
         out = []
+        n = 0
         for col in cols: #Col objects
             ranges = {}
             # ranges_best_rest = {}
@@ -272,37 +300,47 @@ class Data:
                 for row in data.rows:
                     x = row.cells[col.at]
                     if x != '?':
+                        n+=1
                         k = int(self.bin(col, x))
                         if k not in ranges:
                             ranges[k] = Sym(col.at, col.txt) if is_sym else Num(col.at, col.txt)
                         ranges[k].add(x, name)
 
             ranges = { key: value for key, value in sorted(ranges.items(), key=lambda x: x[1].lo) }
-            to_add = list(ranges.values()) if is_sym else merge_any(list(ranges.values()))
+            to_add = list(ranges.values()) if is_sym else merges(list(ranges.values()), n / Common.cfg['the']['bins'], Common.cfg['the']['d'] * col.div())
             out.append(to_add)
             
         return out
 
     # Contrast Sets
     # Collect all the ranges into one flat list and sort them by their `value`.
-    def xpln(self, best, rest, maxSizes):
+    def xpln(self, sway_res):
+
+        tmp = []
+        max_sizes = {}
+
         def v(has):
-            return value(has, len(best.rows), len(rest.rows), "best") #todo this is going to break
+            return value(has, "best", len(sway_res['best'].rows), len(sway_res['rest'].rows)) #todo this is going to break
         
         def score(ranges):
-            rule = Rule(ranges, maxSizes)
+            rule = Rule(ranges, max_sizes)
             if rule != None:
                 #todo print rule
-                bestr = selects(rule, best.rows)
-                restr = selects(rule, rest.rows)
+                bestr = selects(rule, sway_res['best'].rows)
+                restr = selects(rule, sway_res['rest'].rows)
                 if len(bestr) + len(restr) > 0:
                     return {'value': v({'best': len(bestr), 'rest': len(restr)}), 'rule': rule}
             return None
         
-        tmp = []
-        max_sizes = []
 
-        # for range in self.bins(self.cols.x, {'best': best.rows, 'rest': rest.rows}):
-        #     maxSizes[ranges[1].txt] = len(ranges)
-        #     print('')
-        #     for range in ranges:
+
+        for bin_res in self.bins(self.cols.x, sway_res):
+            max_sizes[bin_res[0].txt] = len(bin_res)
+            for range in bin_res:
+                #print stuff
+                tmp.append({'range': range, 'max': len(bin_res), 'val': v(range.sources.has)})
+
+        
+        tmp.sort(key = lambda x: x['val'])
+        first_n_res = first_N(tmp, score)
+        return first_n_res
