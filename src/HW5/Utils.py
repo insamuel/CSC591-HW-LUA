@@ -167,10 +167,6 @@ def cos(a, b, c):
     y = pow(abs((pow(a, 2) - pow(x2, 2))), 0.5)
     return {'x': x2, 'y': y}
 
-def per(t, p = 0.5):
-    p = math.floor((p * len(t)) + 0.5)
-    return t[max(1, min(len(t), p)) - 1]
-
 ##
 # Call "fun" on each row. Row cells are divided in "the.seperator"
 #
@@ -284,13 +280,7 @@ def merge(col1, col2):# col is a num or a sym
 
 def merge2(col1, col2):
     merged = merge(col1, col2)
-    mdiv = merged.div()
-    c1div = col1.div()
-    c1res = (col1.div() * col1.n)
-
-    c2div = col2.div()
-    c2res = (col2.div() * col2.n)
-    res = (((col1.div() * col1.n) + (col2.div() * col2.n)) / merged.n)
+    
     if merged.div() <= (((col1.div() * col1.n) + (col2.div() * col2.n)) / merged.n):
         return merged
     return None

@@ -11,7 +11,7 @@ from Cols import Cols
 from Row import Row
 from Sym import Sym
 from Num import Num
-from Utils import read_csv, rand, cos, many, kap, merge_any,merge
+from Utils import read_csv, rand, cos, many, kap, merge_any, value, selects, Rule
 
 with open("config.yml", 'r') as config_file:
     cfg = yaml.safe_load(config_file)
@@ -148,14 +148,9 @@ class Data:
     # index, and sets mid to the row in the middle.
     ##
     def half(self, cols: Cols = None, above: Row = None, rows = None):
-        selected_rows = rows if rows != None else self.rows
-        
-        index = math.floor(rand(0, len(selected_rows)))
-        A = above if above != None else selected_rows[index] # Row A
 
-        B = self.furthest(A, selected_rows)
-
-        c = self.dist(A, B, cols)
+        def gap(r1, r2):
+            return self.dist(r1, r2, cols)
         
         def project(row: Row):
             projection = cos(self.dist(row, A, cols), self.dist(row, B, cols), c)
@@ -163,6 +158,25 @@ class Data:
             row.y = row.y if row.y != None else float(projection['y'])
             projection["row"] = row
             return projection
+        
+         #sort by distance from row
+        def around(row, rows):
+            return sorted(rows, key=lambda x: gap(x, row))
+
+        def far(row, rows):
+            around_res = around(row, rows)
+            return around_res[int((len(rows) * Common.cfg['the']['Far']))]
+        
+    
+        selected_rows = rows if rows != None else self.rows
+        some = many(selected_rows, Common.cfg['the']['Halves'])
+        
+        A = above if above != None else far(selected_rows[int(rand(0, len(selected_rows)))], some)
+
+        B = far(A, some)
+
+        c = gap(A, B)
+        
 
         sorted_projections = sorted(list(map(project, selected_rows)), key=lambda x: x["x"])
 
@@ -176,13 +190,15 @@ class Data:
             else:
                 right.append(item['row'])
 
+        evals = 1 if above and Common.cfg['the']['Reuse'] else 2
         return {
                 'left': left,
                 'right': right,
                 'A': A,
                 'B': B,
                 'mid': mid,
-                'c': c
+                'c': c,
+                'evals': evals
                 }
 
     
@@ -243,15 +259,15 @@ class Data:
         if x == '?' or type(col) == Sym:
             return x
         tmp = (col.hi - col.lo) / (Common.cfg['the']['bins'] - 1)
-        return 1 if (col.hi == col.lo) else (math.floor(float(x) / tmp + 0.5) * tmp)
+        res = 1 if (col.hi == col.lo) else (math.floor(float(x) / tmp + 0.5) * tmp)
+        return res
 
     def bins(self, cols, rows_set): #rows_set = best, rest result from sway
         out = []
         for col in cols: #Col objects
             ranges = {}
+            # ranges_best_rest = {}
             is_sym = type(col) == Sym
-
-            names = {}
             for name, data in rows_set.items(): #this will go over best, rest groups (lists of Rows)
                 for row in data.rows:
                     x = row.cells[col.at]
@@ -259,15 +275,34 @@ class Data:
                         k = int(self.bin(col, x))
                         if k not in ranges:
                             ranges[k] = Sym(col.at, col.txt) if is_sym else Num(col.at, col.txt)
-                        ranges[k].add(x)
-                        # if not is_sym : #and float(x) not in ranges[k].has.keys()
-                        #     ranges[k].add(x)
+                        ranges[k].add(x, name)
 
             ranges = { key: value for key, value in sorted(ranges.items(), key=lambda x: x[1].lo) }
-            
             to_add = list(ranges.values()) if is_sym else merge_any(list(ranges.values()))
             out.append(to_add)
             
         return out
 
+    # Contrast Sets
+    # Collect all the ranges into one flat list and sort them by their `value`.
+    def xpln(self, best, rest, maxSizes):
+        def v(has):
+            return value(has, len(best.rows), len(rest.rows), "best") #todo this is going to break
         
+        def score(ranges):
+            rule = Rule(ranges, maxSizes)
+            if rule != None:
+                #todo print rule
+                bestr = selects(rule, best.rows)
+                restr = selects(rule, rest.rows)
+                if len(bestr) + len(restr) > 0:
+                    return {'value': v({'best': len(bestr), 'rest': len(restr)}), 'rule': rule}
+            return None
+        
+        tmp = []
+        max_sizes = []
+
+        # for range in self.bins(self.cols.x, {'best': best.rows, 'rest': rest.rows}):
+        #     maxSizes[ranges[1].txt] = len(ranges)
+        #     print('')
+        #     for range in ranges:

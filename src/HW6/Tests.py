@@ -8,7 +8,7 @@ from Num import Num
 from Sym import Sym
 from Row import Row
 from Cols import Cols
-from Utils import rnd, canPrint, rand, set_seed, read_csv, cliffs_delta, get_value
+from Utils import rnd, canPrint, rand, set_seed, read_csv, cliffs_delta
 
 command_line_args = []
 
@@ -147,32 +147,6 @@ def eg_duplicate_structure():
     d2 = d1.clone()
     return len(d1.rows) == len(d2.rows) and d1.cols.y[1].w == d2.cols.y[1].w and d1.cols.y[1].at == d2.cols.y[1].at
 
-@TestEngine.test 
-def test_data():
-    # i know this is horrible but it works
-    expected_output = '\ny\tmid\t{ :Lbs- 2970.42 :Acc+ 15.57 :Mpg+ 23.84}\n \tdiv\t{ :Lbs- 846.84 :Acc+ 2.76 :Mpg+ 8.34}\nx\tmid\t{ :Clndrs 5.45 :Volume 193.43 :Model 76.01 :origin 1}\n \tdiv\t{ :Clndrs 1.7 :Volume 104.27 :Model 3.7 :origin 1.3273558482394003}'
-    test_data = Data('../../etc/data/auto93.csv')
-    
-    y_mid_report = '{'
-    y_div_report = '{'
-    for y in test_data.cols.y:
-        y_mid_report = y_mid_report + ' :' + y.txt + ' ' + str(y.rnd(y.mid(), 2))
-        y_div_report = y_div_report + ' :' + y.txt + ' ' + str(y.rnd(y.div(), 2))
-    y_mid_report = y_mid_report + '}'
-    y_div_report = y_div_report + '}'
-
-    x_mid_report = '{'
-    x_div_report = '{'
-    for x in test_data.cols.x:
-        x_mid_report = x_mid_report + ' :' + x.txt + ' ' + str(x.rnd(x.mid(), 2))
-        x_div_report = x_div_report + ' :' + x.txt + ' ' + str(x.rnd(x.div(), 2))
-    x_mid_report = x_mid_report + '}'
-    x_div_report = x_div_report + '}'
-
-    res_string = '\ny\tmid\t' + y_mid_report + '\n \tdiv\t' + y_div_report + '\nx\tmid\t' + x_mid_report + '\n \tdiv\t' + x_div_report
-    print(res_string)
-    return res_string == expected_output
-
 
 def show_cluster(cluster_res, cols, n_places, level):
     if cluster_res != None:
@@ -246,7 +220,7 @@ def test_half():
     left, right = data.clone(half_res['left']), data.clone(half_res['right'])
     print(left.stats())
     print(right.stats())
-    return True 
+    return True #todo (km) check these are correct
 
 @TestEngine.test
 def test_tree():
@@ -275,12 +249,29 @@ def test_bin():
             if range.txt != b4:
                 print('')
             b4 = range.txt
-            #val = get_value(range.has, len(sway_res['best'].rows), len(sway_res['rest'].rows), "best")
-            print('{ ' + range.txt + ', ' + str(range.lo) + ', ' + str(range.hi) + '}')
+            has = range.sources.has
+            best_ratio = (has['best'] if 'best' in has else 0) / range.sources.n
+            print(range.txt + ', ' + str(range.lo) + ', ' + str(range.hi) + ', ' + str(rnd(best_ratio)) + ', ' + str(range.sources.has))
 
-    return False
+    return True
+
+@TestEngine.test
+def test_resrvoir_sampling():
+    current_max = Common.cfg['the']['Max']
+    Common.cfg['the']['Max'] = 32
+
+    num1 = Num()
+    for i in range(10000):
+        num1.add(i)
 
 
+    Common.cfg['the']['Max'] = current_max #undo that change
+    return len(num1.has) == 32
+
+@TestEngine.test
+def test_xpln():
+    data = Data('../../etc/data/auto93.csv')
+    sway_res = data.sway()
 
 ##
 # Defines a function ALL using @TestEngine.test. This function calls other

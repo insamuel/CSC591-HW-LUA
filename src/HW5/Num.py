@@ -4,7 +4,7 @@ import Common
 
 import numpy
 
-from Utils import rand, per
+from Utils import rand
 
 import Sym
 
@@ -167,8 +167,9 @@ class Num():
         for key, value in self.has.items():
             for i in range(value):
                 running_list.append(key)
-        return numpy.std(running_list)
-
+                
+        res = (numpy.percentile(running_list, 90) - numpy.percentile(running_list, 10)) / 2.58
+        return res
     ##
     # Checks if value is equal to "?". If it is, it returns value as is. If
     # not, it returns the rounded value to n decimal places using the

@@ -38,6 +38,8 @@ class Sym():
         self.most = 0
         self.mode = None
 
+        self.sources = None
+
         self.lo = float('inf')
         self.hi = float('-inf')
 
@@ -59,8 +61,8 @@ class Sym():
     # It increments the num_items (number of symbols processed) by 1.
     # Increments the frequency count of the value in the 'has' defaultdict # by 1.
     ##
-    def add(self, x):
-        if x != '?':
+    def add(self, x, source = None):
+        if x != '?' and x != None:
             self.n = self.n + 1
             if x in self.has:
                 self.has[x] = self.has[x] + 1
@@ -70,6 +72,12 @@ class Sym():
             if self.has[x] > self.most:
                 self.most = self.has[x]
                 self.mode = x
+
+            if self.sources == None:
+                self.sources = Sym()
+            if source != None:
+                self.sources.add(source)
+
 
     ##
     # Calculates the mode, most common symbol
@@ -108,8 +116,8 @@ class Sym():
         e = 0
         for i in self.has:
             p = self.has[i] / self.n
-            e = e + (p * math.log(p, 2))
-        return -e
+            e = e - self.has[i] / self.n * (p * math.log(p, 2))
+        return e
 
     ##
     # Returns `n` unchanged (SYMs do not get rounded)

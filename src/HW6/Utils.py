@@ -3,6 +3,7 @@ import os
 import csv
 import random
 import copy
+import sys
 
 import Common
 import math
@@ -167,10 +168,6 @@ def cos(a, b, c):
     y = pow(abs((pow(a, 2) - pow(x2, 2))), 0.5)
     return {'x': x2, 'y': y}
 
-def per(t, p = 0.5):
-    p = math.floor((p * len(t)) + 0.5)
-    return t[max(1, min(len(t), p)) - 1]
-
 ##
 # Call "fun" on each row. Row cells are divided in "the.seperator"
 #
@@ -246,7 +243,7 @@ def cli(args, configs):
     return configs
 
 def many(list, count):
-    return random.choices(list, k = count)
+    return random.choices(list, k = int(count))
 
 def cliffs_delta(nsA, nsB):
     if len(nsA) > 256:
@@ -275,21 +272,28 @@ def merge(col1, col2):# col is a num or a sym
     for item, count in col2.has.items():
         for i in range(count):
             col1_copy.add(item)
+            
+    for item, count in col2.sources.has.items():
+        for i in range(count):
+            col1_copy.sources.add(item)
     
     return col1_copy
 
-def merge2(col1, col2): # col is a num or a sym
+def merge2(col1, col2):
     merged = merge(col1, col2)
+    
     if merged.div() <= (((col1.div() * col1.n) + (col2.div() * col2.n)) / merged.n):
         return merged
     return None
 
-# A representation of a Num or Col without it's actual values represented. 
+# A representation of a Num or Sym without it's actual values represented. 
 class Range():
-    def __init__(self, txt: str = "", lo: float = -math.inf, hi: float = math.inf):
+    def __init__(self, at: int = 0, txt: str = "", lo: float = -math.inf, hi: float = math.inf):
         self.txt = txt
         self.lo = lo
         self.hi = hi
+        self.at = at
+        self.sources = {}
 
 
 def merge_any(ranges0): #ranges0: sorted lists of ranges (nums)
@@ -298,9 +302,11 @@ def merge_any(ranges0): #ranges0: sorted lists of ranges (nums)
         col_count = len(t)
         out_list = [Range() for i in range(col_count)]
         for j in range(col_count): # copy over the txt, high, and lo values
+            out_list[j].at = t[j].at
             out_list[j].txt = t[j].txt
             out_list[j].lo = t[j].lo
             out_list[j].hi = t[j].hi
+            out_list[j].sources = t[j].sources
 
         for j in range(1, col_count): # shift things
             out_list[j].lo = t[j - 1].hi
@@ -315,27 +321,15 @@ def merge_any(ranges0): #ranges0: sorted lists of ranges (nums)
         to_add = left
         right = ranges0[j + 1] if (j + 1) < len(ranges0) else None
         if right != None:
-            y = merge2(left, right)
+            y = merge2(left.sources, right.sources)
             if y != None:
                 j+= 1
-                to_add = y
+                to_add = merge(left, right)
+
         ranges1.append(to_add)
         j+= 1
     
     return get_no_gaps_ranges(ranges0) if len(ranges0) == len(ranges1) else merge_any(ranges1)
-
-
-def get_value(has, nB = 1, nR = 1, goal = "True"):
-    b = 0
-    r = 0
-    for x, n in has.items():
-        if x == goal:
-            b+= n
-        else:
-            r+= n
-    b = b / (nB + 1 / float('inf'))
-    r = r / (nR + 1 / float('inf'))
-    return pow(b, 2) / (b + r)
 
 ##
 # Function sets the value of seed in the dictionary configs['the'] to x.
@@ -345,6 +339,47 @@ def get_value(has, nB = 1, nR = 1, goal = "True"):
 ##
 def set_seed(x):
     configs['the']['seed'] = x
+
+# A query that returns the score a distribution of symbols inside a SYM.
+# Sorts the ranges (has) by how well the select for <best> using 
+# (probability * support) = (b^2) / (b + r)
+def value(has, nB = 1, nR = 1, sGoal = True):
+    b = 0
+    r = 0
+    for x, n in has:
+        if x == sGoal:
+            b+= n
+        else:
+            r+= n
+    b = b / ((nB + 1) / sys.float_info.max)
+    r = r / ((nR + 1) / sys.float_info.max) #handling zero divide errors
+    return (b**2) / (b + r)
+
+def selects(rule, rows):
+    def disjunction(ranges, row):
+        for i, range in ranges:
+            lo = range.lo
+            hi = range.hi
+            at = range.at
+            x = row.cells[at]
+            if(x == '?' or (lo == hi and lo == x) or (lo <= x and x < hi)):
+                return True
+        return False
+    
+    def conjunction(row):
+        for i, ranges in rule:
+            if not disjunction(ranges, row):
+                return False
+        return True
+    
+    output = []
+    for row in rows:
+        if conjunction(row): #todo i am not sure if this is what his LUA code is doing (is it only returning ones where conjuction returns true?)
+            output.append(row)
+    return output
+    
+
+
 
 ##
 # Create a  RULE that groups `ranges` by their column id.
@@ -360,7 +395,7 @@ def set_seed(x):
 #
 # Prune function is called with the dictionary, t and maximum siz, maxSize.
 ##
-def RULE(ranges, maxSize):
+def Rule(ranges, maxSize):
     t = {}
     for range in ranges:
         if range.txt not in t:
@@ -390,3 +425,5 @@ def prune(rule, maxSize):
             rule[txt] = None
     if n > 0:
         return rule
+    
+
