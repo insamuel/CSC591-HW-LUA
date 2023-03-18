@@ -381,7 +381,9 @@ def selects(rule, rows):
     
     def conjunction(row):
         for i, ranges in rule.items():
-            if ranges is None or not disjunction(ranges, row):
+            if ranges is None:
+                continue
+            if not disjunction(ranges, row):
                 return False
         return True
     
@@ -410,8 +412,7 @@ def selects(rule, rows):
 ##
 def Rule(ranges, maxSizes):
     t = {}
-    for item in ranges:
-        range = item['range']
+    for range in ranges:
         if range.txt not in t:
             t[range.txt] = []
         t[range.txt].append({'lo': range.lo, 'hi': range.hi, 'at': range.at})
@@ -440,24 +441,67 @@ def prune(rule, maxSizes):
     if n > 0:
         return rule
     
-def first_N(sortedRanges, scoreFunction):
-    print('')
-    # ?: for each item in sorted ranges, print txt, lo, hi, etc
+def first_N(sortedRangeItems, scoreFunction):
+    print('\n')
 
-    first = sortedRanges[0]
-    # def useful(range):
-
-    #iterate through sortedRanges, determine which are useful
-    useful_ranges = sortedRanges
-
+    first = sortedRangeItems[0]['val']
+    def useful(item):
+        if item['val'] > 0.05 and item['val'] > (first / 10): 
+            return item
+        return None
+        
+    #iterate through sortedRanges, print each and determine which are "useful"
+    useful_range_items = []
+    for item in sortedRangeItems:
+        print(item['range'].txt + ', ' + str(item['range'].lo) + ', ' + str(item['range'].hi) + ', ' +  str(rnd(item['val'])) + ', ' + str(item['range'].sources.has))
+        if useful(item):
+            useful_range_items.append(item['range'])
+    
     most = -1
     out_rule = None
 
-    for n in range(len(useful_ranges)):
-        for i in range(n):
-            score_res = scoreFunction(useful_ranges[0:i])
-            if score_res != None:
-                if score_res['value'] > most:
-                    out_rule = score_res['rule']
-                    most = score_res['value']
+    print('\n')
+
+    for n in range(len(useful_range_items)):
+        subset = useful_range_items[0:(n + 1)]
+        score_res = scoreFunction(subset)
+        if score_res != None:
+            if score_res['value'] > most:
+                out_rule = score_res['rule']
+                most = score_res['value']
     return {'rule': out_rule, 'most': most}
+
+def show_rule(rule: Rule):
+    def pretty(range):
+        return range['lo'] if range['lo'] == range['hi'] else [range['lo'], range['hi']]
+    
+    def merge_rule(t0):
+        t = []
+        j = 0
+
+        while j < len(t0):
+            left = t0[j]
+            right = t0[j + 1] if (j + 1) < len(t0) else None
+            if right != None and left['hi'] == right['lo']:
+                left['hi'] = right['hi']
+                j+=1
+            t.append({'lo': left['lo'], 'hi': left['hi']})
+            j+=1
+        return t if len(t0) == len(t) else merge_rule(t)
+
+    def merges_rule(attr, ranges):
+        merges_rule_out = {}
+        if ranges == None:
+            merges_rule_out[attr] = []
+            return merges_rule_out
+       
+        sorted_ranges = sorted(ranges, key=lambda x: x['lo'])
+        sorted_ranges = merge_rule(sorted_ranges)
+        for range in sorted_ranges:
+            merges_rule_out[attr] = pretty(range)
+        return merges_rule_out
+    
+    out = []
+    for attribute, items in rule.items():
+        out.append(merges_rule(attribute, items))
+    return out

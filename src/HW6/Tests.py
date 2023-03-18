@@ -8,7 +8,7 @@ from Num import Num
 from Sym import Sym
 from Row import Row
 from Cols import Cols
-from Utils import rnd, canPrint, rand, set_seed, read_csv, cliffs_delta, selects
+from Utils import rnd, canPrint, rand, set_seed, read_csv, cliffs_delta, selects, Rule, show_rule
 
 command_line_args = []
 
@@ -268,17 +268,25 @@ def test_resrvoir_sampling():
     Common.cfg['the']['Max'] = current_max #undo that change
     return len(num1.has) == 32
 
+
 @TestEngine.test
 def test_xpln():
     data = Data('../../etc/data/auto93.csv')
     sway_res = data.sway()
     xpln_res = data.xpln(sway_res)
+
+    print('\n-----------\n')
     if xpln_res['rule'] != None:
+        rule = xpln_res['rule']
+        print('explain=' + str(show_rule(rule)))
+
         #TODO check if this is what we're actually supposed to do:
-        data2 = data.clone(selects(xpln_res['rule'], data.rows))
+        data2 = data.clone(selects(rule, data.rows))
         #print some more stuff
 
-        #TODO implement bettrs in Data class
+        top = data.betters(len(sway_res['best'].rows))
+        top_data = data.clone(top[0])
+        #todo print more stuff
 
     return False
     

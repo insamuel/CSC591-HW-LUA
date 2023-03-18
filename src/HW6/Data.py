@@ -11,7 +11,7 @@ from Cols import Cols
 from Row import Row
 from Sym import Sym
 from Num import Num
-from Utils import read_csv, rand, cos, many, kap, merges, value, selects, Rule, first_N
+from Utils import read_csv, rand, cos, many, kap, merges, value, selects, Rule, first_N, show_rule
 
 with open("config.yml", 'r') as config_file:
     cfg = yaml.safe_load(config_file)
@@ -94,8 +94,11 @@ class Data:
 
         return (s1/len(ys)) < (s2/len(ys))
     
-    # def betters(self, n):
-
+    def betters(self, n = None):
+        sorted_rows = sorted(self.rows, key=functools.cmp_to_key(self.better))
+        if n  is None:
+            return sorted_rows
+        return [sorted_rows[0:n], sorted_rows[-n]]
 
     ##
     # Defines a function "dist" that calculates the distance between two
@@ -320,12 +323,12 @@ class Data:
         max_sizes = {}
 
         def v(has):
-            return value(has, "best", len(sway_res['best'].rows), len(sway_res['rest'].rows)) #todo this is going to break
+            return value(has, "best", len(sway_res['best'].rows), len(sway_res['rest'].rows))
         
         def score(ranges):
             rule = Rule(ranges, max_sizes)
             if rule != None:
-                #todo print rule
+                print(str(show_rule(rule)))
                 bestr = selects(rule, sway_res['best'].rows)
                 restr = selects(rule, sway_res['rest'].rows)
                 if len(bestr) + len(restr) > 0:
@@ -336,11 +339,12 @@ class Data:
 
         for bin_res in self.bins(self.cols.x, sway_res):
             max_sizes[bin_res[0].txt] = len(bin_res)
+            print('\n')
             for range in bin_res:
-                #print stuff
+                print(range.txt + ', ' + str(range.lo) + ', ' + str(range.hi))
                 tmp.append({'range': range, 'max': len(bin_res), 'val': v(range.sources.has)})
 
         
-        tmp.sort(key = lambda x: x['val'])
+        tmp.sort(key = lambda x: x['val'], reverse=True)
         first_n_res = first_N(tmp, score)
         return first_n_res
