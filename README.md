@@ -1,8 +1,8 @@
 [![DOI](https://zenodo.org/badge/590978312.svg)](https://zenodo.org/badge/latestdoi/590978312)
 
 <p> <img src="https://img.shields.io/badge/task-ai-blueviolet"><a
-href="https://github.com/insamuel/tested/actions/workflows/tests.yml"> <img 
- src="https://github.com/insamuel/tested/actions/workflows/tests.yml/badge.svg"></a> <img 
+href="https://github.com/insamuel/CSC591-HW-LUA/actions/workflows/python-app.yml"> <img 
+ src="https://github.com/insamuel/CSC591-HW-LUA/actions/workflows/python-app.yml/badge.svg"></a> <img 
  src="https://img.shields.io/badge/language-python-orange"> <img 
  src="https://img.shields.io/badge/purpose-learning-yellow"> <a 
  href="https://zenodo.org/badge/latestdoi/590978312"> <img 
