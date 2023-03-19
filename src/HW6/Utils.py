@@ -157,7 +157,7 @@ def kap(list, func):
     res = {}
     for i, item in enumerate(list):
         ret = func(item)
-        res[i] = ret
+        res[item.txt] = ret[0]
     return res
 
 #find x,y from a line connecting `a` to `b`

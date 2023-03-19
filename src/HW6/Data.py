@@ -49,7 +49,9 @@ class Data:
             whatFunc = getattr(col, what if what != None else "mid")
             return col.rnd(whatFunc(), places), col.txt
 
-        return kap(cols if cols != None else self.cols.y, fun)
+        res = kap(cols if cols != None else self.cols.y, fun)
+        res['N'] = str(len(self.rows))
+        return res
 
     def clone(self, rows: list[str] = None):
         if(rows == None):
@@ -177,7 +179,7 @@ class Data:
         selected_rows = rows if rows != None else self.rows
         some = many(selected_rows, Common.cfg['the']['Halves'])
         
-        A = above if above != None else far(selected_rows[int(rand(0, len(selected_rows)))], some)
+        A = above if (above != None and Common.cfg['the']['Reuse']) else far(selected_rows[int(rand(0, len(selected_rows)))], some)
 
         B = far(A, some)
 
@@ -228,9 +230,9 @@ class Data:
     # Recursively prune the worst half the data. Return the survivors and some sample of the rest.
     def sway(self):
 
-        def worker(rows, worse, above = None):
+        def worker(rows, worse, evals = 0, above = None):
             if len(rows) <= pow(len(self.rows), Common.cfg['the']['min']):
-                return {'best': rows, 'rest': many(worse, Common.cfg['the']['rest'] * len(rows))}
+                return {'best': rows, 'rest': many(worse, Common.cfg['the']['rest'] * len(rows)), 'evals': evals}
             half_res = self.half(None, above, rows)
             l = half_res['left']
             r = half_res['right']
@@ -243,10 +245,10 @@ class Data:
                 B = half_res['A']
             for row in r:
                 worse.append(row)
-            return worker(l, worse, A)
+            return worker(l, worse, half_res['evals'] + evals, A)
         
         worker_res = worker(self.rows, [])
-        return {'best': self.clone(worker_res['best']), 'rest': self.clone(worker_res['rest'])}
+        return {'best': self.clone(worker_res['best']), 'rest': self.clone(worker_res['rest']), 'evals': worker_res['evals']}
 
         
             
@@ -269,30 +271,7 @@ class Data:
         return res
 
     def bins(self, cols, rows_set): #rows_set = best, rest result from sway 
-
-        # def with_all_rows(col):
-            
-        #     ranges = {}
-        #     n = 0
-
-        #     def xy(x, y):
-        #         if x != '?':
-        #             n+= 1
-        #             k = int(self.bin(col, x))
-        #             if k not in ranges:
-        #                 ranges[k] = Sym(col.at, col.txt) if is_sym else Num(col.at, col.txt)
-        #             ranges[k].add(x, name)
-
-        #     for name, data in rows_set.items():
-        #         for row in data.rows:
-        #             xy(row[col.at], name)
-           
-        #     return {'n': n, 'to_add': to_add}
-
-
-        # def with1Col(col):
-        #     all_rows_res = with_all_rows(col)
-            
+          
         out = []
         n = 0
         for col in cols: #Col objects
