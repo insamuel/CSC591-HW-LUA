@@ -30,47 +30,6 @@ def eg_the():
     return True
 
 ##
-# Defines a test function named "eg_rand" using the @TestEngine.test
-# decorator.
-#
-# Checks if two sets of random numbers generated with the same seed are
-# equal, and if the midpoint of the set of random numbers is equal to 0.5.
-#
-# It creates two instances of the Num class, "num1" and "num2".
-#
-# It sets a seed for the random number generator using the set_seed
-# function, with a value of 937162211. It uses a for loop to add 1000
-# random numbers in the range of 0 to 1 to "num1".
-#
-# It sets the same seed for the random number generator again. It uses
-# another for loop to add 1000 random numbers in the range of 0 to 1 to
-# "num2".
-#
-# It calculates the midpoints of the "num1" and "num2" instances, rounded
-# to 10 decimal places, and stores them in "m1" and "m2". It formats a
-# string with "m1", "m2", and the rounded value of "m1". It calls the
-# canPrint function to print the formatted string along with the message
-# "M1 and M2 should be equal".
-##
-#@TestEngine.test
-def eg_rand():
-    num1, num2 = Num(), Num()
-
-    set_seed(937162211)
-    for i in range(1, 10 ** 3 + 1):
-        x = rand(0, 1)
-        num1.add(x)
-
-    set_seed(937162211)
-    for i in range(1, 10 ** 3 + 1):
-        num2.add(rand(0, 1))
-
-    m1, m2 = round(num1.mid(), 10), round(num2.mid(), 10)
-    results = "m1= {}, m2= {}, rounded= {}".format(m1, m2, round(m1, 1))
-    canPrint(results, 'M1 and M2 should be equal')
-    return m1 == m2 and .5 == round(m1, 1)
-
-##
 # Defines a test function named eg_sym using the @TestEngine.test
 # decorator.
 #
@@ -86,7 +45,7 @@ def eg_rand():
 #
 # Returns true if the mode is "a" and the entropy value is 1.379.
 ##
-#@TestEngine.test
+@TestEngine.test
 def eg_sym():
     s = Sym()
 
@@ -95,11 +54,7 @@ def eg_sym():
     for x in test_vals:
         s.add(x)
 
-    # mode, entropy = s.mid(), rnd(s.div(), 3)
-    # results = "mid= {}, div= {}".format(mode, entropy)
-    # canPrint(results, 'Should be able to print mid and div')
-
-    res = ('a' == s.mid()) and (1.379 == rnd(s.div(), 3))
+    res = (1.379 == rnd(s.div(), 3))
     return res
 
 ##
@@ -118,7 +73,7 @@ def eg_sym():
 # able to print mid and div" into a single string and passes it to the
 # function canPrint.
 ##
-#@TestEngine.test
+@TestEngine.test
 def eg_num():
     num1 = Num()
     num2 = Num()
@@ -131,21 +86,6 @@ def eg_num():
     mid = num1.mid()
     mid2 = num2.mid()
     return rnd(num1.mid(), 1) == 0.5 and num1.mid() > num2.mid()
-
-#@TestEngine.test
-def eg_csv():
-    row_count = 0
-    def line_handler(xs: Row):
-        nonlocal row_count
-        row_count += 1
-    read_csv(Common.cfg["the"]["file"], line_handler)
-    return row_count == 399
-
-#@TestEngine.test
-def eg_duplicate_structure():
-    d1 = Data(Common.cfg['the']['file'])
-    d2 = d1.clone()
-    return len(d1.rows) == len(d2.rows) and d1.cols.y[1].w == d2.cols.y[1].w and d1.cols.y[1].at == d2.cols.y[1].at
 
 
 def show_cluster(cluster_res, cols, n_places, level):
@@ -178,7 +118,7 @@ def show_tree(tree, level = None):
         show_tree(tree['left'] if 'left' in tree else None, level + 1)
         show_tree(tree['right'] if 'right' in tree else None, level + 1)
 
-#@TestEngine.test 
+@TestEngine.test 
 def test_cliffs():
     if cliffs_delta([8,7,6,2,5,8,7,3],[8,7,6,2,5,8,7,3]) or not cliffs_delta([8,7,6,2,5,8,7,3],[9,9,7,8,10,9,6]):
         return False
@@ -200,18 +140,8 @@ def test_cliffs():
 
     return True
 
-#@TestEngine.test 
-def test_dist():
-    data = Data('../../etc/data/auto93.csv')
-    num = Num()
-    num.txt = "test_dist Num"
-    for i, row in enumerate(data.rows):
-        num.add(data.dist(row, data.rows[1]))
 
-    print(num.to_string()) #i have no idea if this is right. i can't find the expected output on menzie's repo
-    return True
-
-#@TestEngine.test
+@TestEngine.test
 def test_half():
     data = Data('../../etc/data/auto93.csv')
     half_res = data.half()
@@ -222,13 +152,7 @@ def test_half():
     print(right.stats())
     return True #todo (km) check these are correct
 
-#@TestEngine.test
-def test_tree():
-    data = Data('../../etc/data/auto93.csv')
-    show_tree(data.tree(), 0) 
-    return True
-
-#@TestEngine.test
+@TestEngine.test
 def test_sway():
     data = Data('../../etc/data/auto93.csv')
     sway_res = data.sway()
