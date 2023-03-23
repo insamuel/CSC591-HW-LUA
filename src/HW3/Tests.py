@@ -234,13 +234,6 @@ def test_sway():
 
     return True
 
-##
-# Defines a function ALL using @TestEngine.test. This function calls other
-# functions, whose names start with eg_, stored in Common.eg, one by one,
-# and prints their results. The function also keeps track of the number of
-# failed tests in the Common.fails variable. The function returns True at
-# the end.
-##
 @TestEngine.test
 def ALL():
     for k in Common.eg:
@@ -248,7 +241,7 @@ def ALL():
             print('\n' + "---------------------------------------")
             if not TestEngine.runs(k):
                 Common.fails += 1
-    return True
+    return Common.fails == 0
 
 ##
 # Checks if the script is being run as the main program and if so, it calls

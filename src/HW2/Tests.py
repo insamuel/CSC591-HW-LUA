@@ -115,9 +115,15 @@ def ALL():
             print('\n' + "---------------------------------------")
             if not TestEngine.runs(k):
                 Common.fails += 1
-    return True
+    return Common.fails == 0
 
-
+##
+# Checks if the script is being run as the main program and if so, it calls
+# the TestEngine.runs function with the value of the eg key of the
+# dictionary of Common.cfg as its argument. After the call to TestEngine
+# runs, the program exits with the value of Common.fails as the exit status
+# code.
+##
 if __name__ == "__main__":
     TestEngine.runs(Common.cfg["the"]["eg"])
     sys.exit(Common.fails)

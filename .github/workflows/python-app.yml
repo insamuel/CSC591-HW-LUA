@@ -1,39 +1,48 @@
-# This workflow will install Python dependencies, run tests and lint with a single version of Python
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python
-
-name: Python application
-
+name: Run Tests On Push
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
   pull_request:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
+    branches:
+      - main
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Python 3.10
-      uses: actions/setup-python@v3
-      with:
-        python-version: "3.10"
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install flake8 pytest
-        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: Lint with flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-    - name: Test with pytest
-      run: |
-        pytest
+      - uses: actions/checkout@v3
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v3
+        with:
+          python-version: "3.10"
+          
+      - name: Install dependencies
+        run: |
+          pip install pyyaml
+          pip install numpy
+      #NOTE: we need to add to this whenever we add a test suite
+      - name: Run HW1 Tests 
+        run: |
+          cd src/HW1
+          python Tests.py
+      - name: Run HW2 Tests 
+        run: |
+          cd src/HW2
+          python Tests.py
+      - name: Run HW3 Tests 
+        run: |
+          cd src/HW3
+          python Tests.py
+      - name: Run HW4 Tests 
+        run: |
+          cd src/HW4
+          python Tests.py
+      - name: Run HW5 Tests 
+        run: |
+          cd src/HW5
+          python Tests.py
+      - name: Run HW6 Tests 
+        run: |
+          cd src/HW6
+          python Tests.py

@@ -233,7 +233,7 @@ def ALL():
             print('\n' + "---------------------------------------")
             if not TestEngine.runs(k):
                 Common.fails += 1
-    return True
+    return Common.fails == 0
 
 ##
 # Checks if the script is being run as the main program and if so, it calls
