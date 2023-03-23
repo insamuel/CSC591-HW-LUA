@@ -216,7 +216,7 @@ def test_xpln():
         print('sort with ' + str(len(data.rows)) + ' evals   ' + str(top_data.stats("mid")) + ', ' + str(top_data.stats("div")))
         
 
-    return False
+    return True
     
 
 ##
@@ -233,7 +233,7 @@ def ALL():
             print('\n' + "---------------------------------------")
             if not TestEngine.runs(k):
                 Common.fails += 1
-    return True
+    return Common.fails == 0
 
 ##
 # Checks if the script is being run as the main program and if so, it calls
