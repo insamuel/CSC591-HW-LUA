@@ -11,7 +11,7 @@ from Cols import Cols
 from Row import Row
 from Sym import Sym
 from Num import Num
-from Utils import read_csv, rand, cos, many, kap, merge_any,merge
+from Utils import read_csv, rand, cos, many, kap, merges, value, selects, Rule, first_N, show_rule
 
 with open("config.yml", 'r') as config_file:
     cfg = yaml.safe_load(config_file)
@@ -49,7 +49,9 @@ class Data:
             whatFunc = getattr(col, what if what != None else "mid")
             return col.rnd(whatFunc(), places), col.txt
 
-        return kap(cols if cols != None else self.cols.y, fun)
+        res = kap(cols if cols != None else self.cols.y, fun)
+        res['N'] = str(len(self.rows))
+        return res
 
     def clone(self, rows: list[str] = None):
         if(rows == None):
@@ -93,6 +95,12 @@ class Data:
             s2 = s2 - math.exp(col.w * ((y-x)/len(ys)))
 
         return (s1/len(ys)) < (s2/len(ys))
+    
+    def betters(self, n = None):
+        sorted_rows = sorted(self.rows, key=functools.cmp_to_key(self.better))
+        if n  is None:
+            return sorted_rows
+        return [sorted_rows[0:n], sorted_rows[-n]]
 
     ##
     # Defines a function "dist" that calculates the distance between two
@@ -148,14 +156,9 @@ class Data:
     # index, and sets mid to the row in the middle.
     ##
     def half(self, cols: Cols = None, above: Row = None, rows = None):
-        selected_rows = rows if rows != None else self.rows
-        
-        index = math.floor(rand(0, len(selected_rows)))
-        A = above if above != None else selected_rows[index] # Row A
 
-        B = self.furthest(A, selected_rows)
-
-        c = self.dist(A, B, cols)
+        def gap(r1, r2):
+            return self.dist(r1, r2, cols)
         
         def project(row: Row):
             projection = cos(self.dist(row, A, cols), self.dist(row, B, cols), c)
@@ -163,6 +166,25 @@ class Data:
             row.y = row.y if row.y != None else float(projection['y'])
             projection["row"] = row
             return projection
+        
+         #sort by distance from row
+        def around(row, rows):
+            return sorted(rows, key=lambda x: gap(x, row))
+
+        def far(row, rows):
+            around_res = around(row, rows)
+            return around_res[int((len(rows) * Common.cfg['the']['Far']))]
+        
+    
+        selected_rows = rows if rows != None else self.rows
+        some = many(selected_rows, Common.cfg['the']['Halves'])
+        
+        A = above if (above != None and Common.cfg['the']['Reuse']) else far(selected_rows[int(rand(0, len(selected_rows)))], some)
+
+        B = far(A, some)
+
+        c = gap(A, B)
+        
 
         sorted_projections = sorted(list(map(project, selected_rows)), key=lambda x: x["x"])
 
@@ -176,13 +198,15 @@ class Data:
             else:
                 right.append(item['row'])
 
+        evals = 1 if above and Common.cfg['the']['Reuse'] else 2
         return {
                 'left': left,
                 'right': right,
                 'A': A,
                 'B': B,
                 'mid': mid,
-                'c': c
+                'c': c,
+                'evals': evals
                 }
 
     
@@ -206,9 +230,9 @@ class Data:
     # Recursively prune the worst half the data. Return the survivors and some sample of the rest.
     def sway(self):
 
-        def worker(rows, worse, above = None):
+        def worker(rows, worse, evals = 0, above = None):
             if len(rows) <= pow(len(self.rows), Common.cfg['the']['min']):
-                return {'best': rows, 'rest': many(worse, Common.cfg['the']['rest'] * len(rows))}
+                return {'best': rows, 'rest': many(worse, Common.cfg['the']['rest'] * len(rows)), 'evals': evals}
             half_res = self.half(None, above, rows)
             l = half_res['left']
             r = half_res['right']
@@ -221,10 +245,10 @@ class Data:
                 B = half_res['A']
             for row in r:
                 worse.append(row)
-            return worker(l, worse, A)
+            return worker(l, worse, half_res['evals'] + evals, A)
         
         worker_res = worker(self.rows, [])
-        return {'best': self.clone(worker_res['best']), 'rest': self.clone(worker_res['rest'])}
+        return {'best': self.clone(worker_res['best']), 'rest': self.clone(worker_res['rest']), 'evals': worker_res['evals']}
 
         
             
@@ -243,31 +267,63 @@ class Data:
         if x == '?' or type(col) == Sym:
             return x
         tmp = (col.hi - col.lo) / (Common.cfg['the']['bins'] - 1)
-        return 1 if (col.hi == col.lo) else (math.floor(float(x) / tmp + 0.5) * tmp)
+        res = 1 if (col.hi == col.lo) else (math.floor(float(x) / tmp + 0.5) * tmp)
+        return res
 
-    def bins(self, cols, rows_set): #rows_set = best, rest result from sway
+    def bins(self, cols, rows_set): #rows_set = best, rest result from sway 
+          
         out = []
+        n = 0
         for col in cols: #Col objects
             ranges = {}
+            # ranges_best_rest = {}
             is_sym = type(col) == Sym
-
-            names = {}
             for name, data in rows_set.items(): #this will go over best, rest groups (lists of Rows)
                 for row in data.rows:
                     x = row.cells[col.at]
                     if x != '?':
+                        n+=1
                         k = int(self.bin(col, x))
                         if k not in ranges:
                             ranges[k] = Sym(col.at, col.txt) if is_sym else Num(col.at, col.txt)
-                        ranges[k].add(x)
-                        # if not is_sym : #and float(x) not in ranges[k].has.keys()
-                        #     ranges[k].add(x)
+                        ranges[k].add(x, name)
 
             ranges = { key: value for key, value in sorted(ranges.items(), key=lambda x: x[1].lo) }
-            
-            to_add = list(ranges.values()) if is_sym else merge_any(list(ranges.values()))
+            to_add = list(ranges.values()) if is_sym else merges(list(ranges.values()), n / Common.cfg['the']['bins'], Common.cfg['the']['d'] * col.div())
             out.append(to_add)
             
         return out
 
+    # Contrast Sets
+    # Collect all the ranges into one flat list and sort them by their `value`.
+    def xpln(self, sway_res):
+
+        tmp = []
+        max_sizes = {}
+
+        def v(has):
+            return value(has, "best", len(sway_res['best'].rows), len(sway_res['rest'].rows))
         
+        def score(ranges):
+            rule = Rule(ranges, max_sizes)
+            if rule != None:
+                print(str(show_rule(rule)))
+                bestr = selects(rule, sway_res['best'].rows)
+                restr = selects(rule, sway_res['rest'].rows)
+                if len(bestr) + len(restr) > 0:
+                    return {'value': v({'best': len(bestr), 'rest': len(restr)}), 'rule': rule}
+            return None
+        
+
+
+        for bin_res in self.bins(self.cols.x, sway_res):
+            max_sizes[bin_res[0].txt] = len(bin_res)
+            print('\n')
+            for range in bin_res:
+                print(range.txt + ', ' + str(range.lo) + ', ' + str(range.hi))
+                tmp.append({'range': range, 'max': len(bin_res), 'val': v(range.sources.has)})
+
+        
+        tmp.sort(key = lambda x: x['val'], reverse=True)
+        first_n_res = first_N(tmp, score)
+        return first_n_res

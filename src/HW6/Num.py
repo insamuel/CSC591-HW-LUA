@@ -4,9 +4,9 @@ import Common
 
 import numpy
 
-from Utils import rand, per
+from Utils import rand
 
-
+import Sym
 
 
 ##
@@ -52,6 +52,8 @@ class Num():
         self.has = {}
         self.n = 0
 
+        self.sources = Sym.Sym()
+
         self.lo = float('inf')
         self.hi = float('-inf')
 
@@ -89,22 +91,27 @@ class Num():
     # the.Max/col.n replace any existing item
     # (selected at random). If anything is added, the list
     # may not longer be sorted so set `col.ok=false`.
-    def add(self, value):
+    def add(self, value, source = None):
         if value != '?':
             capacity = Common.cfg['the']['Max']
             if self.n >= capacity:
-                random_victim = int(rand(1, len(self.has.keys()))) if rand() < capacity / self.n else None
+                rand_value = rand()
+                random_victim = int(rand(0, len(self.has.keys()))) if rand_value < capacity / self.n else None
                 if random_victim != None: # make room
                     key = list(self.has.keys())[random_victim]
-                    removed_count = self.has[key]
-                    self.n-= removed_count
+                    
+                    self.n-= 1
                     if key == self.lo:
                         sorted_asc = sorted(self.has.keys())
                         self.lo = sorted_asc[0]
                     if key == self.hi:
                         sorted_asc = sorted(self.has.keys(), reverse=True)
                         self.hi = sorted_asc[0]
-                    self.has.pop(key)
+                    self.has[key]-= 1
+                    
+                    if self.has[key] <= 0:
+                        self.has.pop(key)
+
                 else: # if we didn't make room, just quit here
                     return 
 
@@ -117,6 +124,8 @@ class Num():
             self.n+= 1
             self.lo = min(float_value, self.lo)
             self.hi = max(float_value, self.hi)
+
+            self.sources.add(source)
 
     def set_lo(self, x: float):
         self.lo = x
@@ -161,7 +170,6 @@ class Num():
                 
         res = (numpy.percentile(running_list, 90) - numpy.percentile(running_list, 10)) / 2.58
         return res
-
     ##
     # Checks if value is equal to "?". If it is, it returns value as is. If
     # not, it returns the rounded value to n decimal places using the

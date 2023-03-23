@@ -1,0 +1,98 @@
+
+---------------------------------------
+{'Far': 0.95, 'Halves': 512.0, 'Max': 512, 'Reuse': True, 'bins': 16.0, 'cliffs': 0.147, 'd': 0.35, 'dump': False, 'eg': 'ALL', 'far': 0.95, 'file': '../../etc/data/auto93.csv', 'go': True, 'help': False, 'min': 0.5, 'p': 2, 'quit': False, 'rest': 4, 'sample': 512, 'seed': 937162211.0}
+!!!!!!	PASS	the	True
+
+---------------------------------------
+!!!!!!	PASS	sym	True
+
+---------------------------------------
+!!!!!!	PASS	num	True
+
+---------------------------------------
+> 1.0 False
+> 1.02 False
+> 1.05 False
+> 1.08 False
+> 1.1 True
+!!!!!!	PASS	t_cliffs	True
+
+---------------------------------------
+199, 199
+{'Lbs-': 2317.7, 'Acc+': 16.55, 'Mpg+': 29.2, 'N': '199'}
+{'Lbs-': 3623.15, 'Acc+': 14.59, 'Mpg+': 18.49, 'N': '199'}
+!!!!!!	PASS	t_half	True
+
+---------------------------------------
+all: {'Lbs-': 2970.42, 'Acc+': 15.57, 'Mpg+': 23.84, 'N': '398'}
+best: {'Lbs-': 2310.15, 'Acc+': 18.13, 'Mpg+': 35.38, 'N': '13'}
+rest: {'Lbs-': 2887.69, 'Acc+': 16.08, 'Mpg+': 24.62, 'N': '52'}
+!!!!!!	PASS	t_sway	True
+
+---------------------------------------
+[all] best: 12, rest: 48
+
+Clndrs, -inf, 4.0, 0.32, {'rest': 25, 'best': 12}
+Clndrs, 4.0, inf, 0.0, {'rest': 23}
+
+Volume, -inf, 90.0, 0.4, {'best': 4, 'rest': 6}
+Volume, 90.0, 116.0, 0.33, {'best': 6, 'rest': 12}
+Volume, 116.0, 200.0, 0.17, {'best': 2, 'rest': 10}
+Volume, 200.0, inf, 0.0, {'rest': 20}
+
+Model, -inf, 75.0, 0.0, {'rest': 21}
+Model, 75.0, inf, 0.31, {'best': 12, 'rest': 27}
+
+origin, inf, -inf, 0.67, {'best': 12, 'rest': 6}
+origin, inf, -inf, 0.0, {'rest': 32}
+origin, inf, -inf, 0.0, {'rest': 10}
+!!!!!!	PASS	t_bin	True
+
+---------------------------------------
+!!!!!!	PASS	t_resrvoir_sampling	True
+
+---------------------------------------
+
+
+Clndrs, -inf, 4.0
+Clndrs, 4.0, inf
+
+
+Volume, -inf, 90.0
+Volume, 90.0, 116.0
+Volume, 116.0, 200.0
+Volume, 200.0, inf
+
+
+Model, -inf, 75.0
+Model, 75.0, inf
+
+
+origin, inf, -inf
+origin, inf, -inf
+origin, inf, -inf
+
+
+origin, inf, -inf, 0.89, {'best': 12, 'rest': 6}
+Clndrs, -inf, 4.0, 0.66, {'rest': 25, 'best': 12}
+Model, 75.0, inf, 0.64, {'best': 12, 'rest': 27}
+Volume, 90.0, 116.0, 0.33, {'best': 6, 'rest': 12}
+Volume, -inf, 90.0, 0.24, {'best': 4, 'rest': 6}
+Volume, 116.0, 200.0, 0.07, {'best': 2, 'rest': 10}
+Clndrs, 4.0, inf, 0.0, {'rest': 23}
+Volume, 200.0, inf, 0.0, {'rest': 20}
+Model, -inf, 75.0, 0.0, {'rest': 21}
+origin, inf, -inf, 0.0, {'rest': 32}
+origin, inf, -inf, 0.0, {'rest': 10}
+
+
+[{'origin': [inf, -inf]}]
+[{'origin': [inf, -inf]}, {'Clndrs': [-inf, 4.0]}]
+[{'origin': [inf, -inf]}, {'Clndrs': [-inf, 4.0]}, {'Model': [75.0, inf]}]
+[{'origin': [inf, -inf]}, {'Clndrs': [-inf, 4.0]}, {'Model': [75.0, inf]}, {'Volume': [90.0, 116.0]}]
+[{'origin': [inf, -inf]}, {'Clndrs': [-inf, 4.0]}, {'Model': [75.0, inf]}, {'Volume': [-inf, 116.0]}]
+
+-----------
+
+!!!!!!	PASS	t_xpln	True
+!!!!!!	PASS	ALL	True

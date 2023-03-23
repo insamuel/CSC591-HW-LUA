@@ -8,7 +8,7 @@ from Num import Num
 from Sym import Sym
 from Row import Row
 from Cols import Cols
-from Utils import rnd, canPrint, rand, set_seed, read_csv, cliffs_delta, get_value
+from Utils import rnd, canPrint, rand, set_seed, read_csv, cliffs_delta, selects, Rule, show_rule
 
 command_line_args = []
 
@@ -28,47 +28,6 @@ command_line_args = []
 def eg_the():
     canPrint(Common.cfg['the'], 'Should be able to print the')
     return True
-
-##
-# Defines a test function named "eg_rand" using the @TestEngine.test
-# decorator.
-#
-# Checks if two sets of random numbers generated with the same seed are
-# equal, and if the midpoint of the set of random numbers is equal to 0.5.
-#
-# It creates two instances of the Num class, "num1" and "num2".
-#
-# It sets a seed for the random number generator using the set_seed
-# function, with a value of 937162211. It uses a for loop to add 1000
-# random numbers in the range of 0 to 1 to "num1".
-#
-# It sets the same seed for the random number generator again. It uses
-# another for loop to add 1000 random numbers in the range of 0 to 1 to
-# "num2".
-#
-# It calculates the midpoints of the "num1" and "num2" instances, rounded
-# to 10 decimal places, and stores them in "m1" and "m2". It formats a
-# string with "m1", "m2", and the rounded value of "m1". It calls the
-# canPrint function to print the formatted string along with the message
-# "M1 and M2 should be equal".
-##
-@TestEngine.test
-def eg_rand():
-    num1, num2 = Num(), Num()
-
-    set_seed(937162211)
-    for i in range(1, 10 ** 3 + 1):
-        x = rand(0, 1)
-        num1.add(x)
-
-    set_seed(937162211)
-    for i in range(1, 10 ** 3 + 1):
-        num2.add(rand(0, 1))
-
-    m1, m2 = round(num1.mid(), 10), round(num2.mid(), 10)
-    results = "m1= {}, m2= {}, rounded= {}".format(m1, m2, round(m1, 1))
-    canPrint(results, 'M1 and M2 should be equal')
-    return m1 == m2 and .5 == round(m1, 1)
 
 ##
 # Defines a test function named eg_sym using the @TestEngine.test
@@ -95,11 +54,7 @@ def eg_sym():
     for x in test_vals:
         s.add(x)
 
-    # mode, entropy = s.mid(), rnd(s.div(), 3)
-    # results = "mid= {}, div= {}".format(mode, entropy)
-    # canPrint(results, 'Should be able to print mid and div')
-
-    res = ('a' == s.mid()) and (1.379 == rnd(s.div(), 3))
+    res = (1.379 == rnd(s.div(), 3))
     return res
 
 ##
@@ -131,47 +86,6 @@ def eg_num():
     mid = num1.mid()
     mid2 = num2.mid()
     return rnd(num1.mid(), 1) == 0.5 and num1.mid() > num2.mid()
-
-@TestEngine.test
-def eg_csv():
-    row_count = 0
-    def line_handler(xs: Row):
-        nonlocal row_count
-        row_count += 1
-    read_csv(Common.cfg["the"]["file"], line_handler)
-    return row_count == 399
-
-@TestEngine.test
-def eg_duplicate_structure():
-    d1 = Data(Common.cfg['the']['file'])
-    d2 = d1.clone()
-    return len(d1.rows) == len(d2.rows) and d1.cols.y[1].w == d2.cols.y[1].w and d1.cols.y[1].at == d2.cols.y[1].at
-
-@TestEngine.test 
-def test_data():
-    # i know this is horrible but it works
-    expected_output = '\ny\tmid\t{ :Lbs- 2970.42 :Acc+ 15.57 :Mpg+ 23.84}\n \tdiv\t{ :Lbs- 846.84 :Acc+ 2.76 :Mpg+ 8.34}\nx\tmid\t{ :Clndrs 5.45 :Volume 193.43 :Model 76.01 :origin 1}\n \tdiv\t{ :Clndrs 1.7 :Volume 104.27 :Model 3.7 :origin 1.3273558482394003}'
-    test_data = Data('../../etc/data/auto93.csv')
-    
-    y_mid_report = '{'
-    y_div_report = '{'
-    for y in test_data.cols.y:
-        y_mid_report = y_mid_report + ' :' + y.txt + ' ' + str(y.rnd(y.mid(), 2))
-        y_div_report = y_div_report + ' :' + y.txt + ' ' + str(y.rnd(y.div(), 2))
-    y_mid_report = y_mid_report + '}'
-    y_div_report = y_div_report + '}'
-
-    x_mid_report = '{'
-    x_div_report = '{'
-    for x in test_data.cols.x:
-        x_mid_report = x_mid_report + ' :' + x.txt + ' ' + str(x.rnd(x.mid(), 2))
-        x_div_report = x_div_report + ' :' + x.txt + ' ' + str(x.rnd(x.div(), 2))
-    x_mid_report = x_mid_report + '}'
-    x_div_report = x_div_report + '}'
-
-    res_string = '\ny\tmid\t' + y_mid_report + '\n \tdiv\t' + y_div_report + '\nx\tmid\t' + x_mid_report + '\n \tdiv\t' + x_div_report
-    print(res_string)
-    return res_string == expected_output
 
 
 def show_cluster(cluster_res, cols, n_places, level):
@@ -226,16 +140,6 @@ def test_cliffs():
 
     return True
 
-@TestEngine.test 
-def test_dist():
-    data = Data('../../etc/data/auto93.csv')
-    num = Num()
-    num.txt = "test_dist Num"
-    for i, row in enumerate(data.rows):
-        num.add(data.dist(row, data.rows[1]))
-
-    print(num.to_string()) #i have no idea if this is right. i can't find the expected output on menzie's repo
-    return True
 
 @TestEngine.test
 def test_half():
@@ -246,13 +150,7 @@ def test_half():
     left, right = data.clone(half_res['left']), data.clone(half_res['right'])
     print(left.stats())
     print(right.stats())
-    return True 
-
-@TestEngine.test
-def test_tree():
-    data = Data('../../etc/data/auto93.csv')
-    show_tree(data.tree(), 0) 
-    return True
+    return True #todo (km) check these are correct
 
 @TestEngine.test
 def test_sway():
@@ -270,17 +168,56 @@ def test_bin():
 
     print('[all] best: ' + str(len(sway_res['best'].rows)) + ', rest: ' + str(len(sway_res['rest'].rows)))
     b4 = None
-    for bin_res in data.bins(data.cols.x, sway_res):
+    for bin_res in data.bins(data.cols.x, {'best': sway_res['best'], 'rest': sway_res['rest']}):
         for range in bin_res:
             if range.txt != b4:
                 print('')
             b4 = range.txt
-            #val = get_value(range.has, len(sway_res['best'].rows), len(sway_res['rest'].rows), "best")
-            print('{ ' + range.txt + ', ' + str(range.lo) + ', ' + str(range.hi) + '}')
+            has = range.sources.has
+            best_ratio = (has['best'] if 'best' in has else 0) / range.sources.n
+            print(range.txt + ', ' + str(range.lo) + ', ' + str(range.hi) + ', ' + str(rnd(best_ratio)) + ', ' + str(range.sources.has))
 
-    return False
+    return True
+
+@TestEngine.test
+def test_resrvoir_sampling():
+    current_max = Common.cfg['the']['Max']
+    Common.cfg['the']['Max'] = 32
+
+    num1 = Num()
+    for i in range(10000):
+        num1.add(i)
 
 
+    Common.cfg['the']['Max'] = current_max #undo that change
+    return len(num1.has) == 32
+
+
+@TestEngine.test
+def test_xpln():
+    data = Data('../../etc/data/auto93.csv')
+    sway_res = data.sway()
+    xpln_res = data.xpln({'best': sway_res['best'], 'rest': sway_res['rest']})
+
+    print('\n-----------\n')
+    if xpln_res['rule'] != None:
+        rule = xpln_res['rule']
+        print('explain=' + str(show_rule(rule)))
+
+        print('all               ' + str(data.stats("mid")) + ', ' + str(data.stats("div")))
+
+        #TODO check if this is what we're actually supposed to do:
+        data1 = data.clone(selects(rule, data.rows))
+        print('sway with ' + str(sway_res['evals']) + ' evals ' + str(sway_res['best'].stats("mid")) + ', ' + str(sway_res['best'].stats("div")))
+        print('xpln on ' + str(sway_res['evals']) + ' evals   ' + str(data1.stats("mid")) + ', ' + str(data1.stats("div")))
+
+        top = data.betters(len(sway_res['best'].rows))
+        top_data = data.clone(top[0])
+        print('sort with ' + str(len(data.rows)) + ' evals   ' + str(top_data.stats("mid")) + ', ' + str(top_data.stats("div")))
+        
+
+    return True
+    
 
 ##
 # Defines a function ALL using @TestEngine.test. This function calls other

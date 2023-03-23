@@ -243,14 +243,15 @@ class Data:
         if x == '?' or type(col) == Sym:
             return x
         tmp = (col.hi - col.lo) / (Common.cfg['the']['bins'] - 1)
-        return 1 if (col.hi == col.lo) else (math.floor(float(x) / tmp + 0.5) * tmp)
+        res = 1 if (col.hi == col.lo) else (math.floor(float(x) / tmp + 0.5) * tmp)
+        return res
 
     def bins(self, cols, rows_set): #rows_set = best, rest result from sway
         out = []
         for col in cols: #Col objects
             ranges = {}
+            # ranges_best_rest = {}
             is_sym = type(col) == Sym
-            names = {}
             for name, data in rows_set.items(): #this will go over best, rest groups (lists of Rows)
                 for row in data.rows:
                     x = row.cells[col.at]
@@ -259,9 +260,13 @@ class Data:
                         if k not in ranges:
                             ranges[k] = Sym(col.at, col.txt) if is_sym else Num(col.at, col.txt)
                         ranges[k].add(x, name)
+                            # entry = ranges_best_rest[k]
+                            # if name == "best":
+                            #     entry["best"]+= 1
+                            # else:
+                            #     entry["rest"]+= 1
 
             ranges = { key: value for key, value in sorted(ranges.items(), key=lambda x: x[1].lo) }
-            
             to_add = list(ranges.values()) if is_sym else merge_any(list(ranges.values()))
             out.append(to_add)
             

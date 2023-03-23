@@ -116,8 +116,8 @@ class Sym():
         e = 0
         for i in self.has:
             p = self.has[i] / self.n
-            e = e + (p * math.log(p, 2))
-        return -e
+            e = e - self.has[i] / self.n * (p * math.log(p, 2))
+        return e
 
     ##
     # Returns `n` unchanged (SYMs do not get rounded)
