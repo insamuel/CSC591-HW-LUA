@@ -216,7 +216,7 @@ def test_xpln():
         print('sort with ' + str(len(data.rows)) + ' evals   ' + str(top_data.stats("mid")) + ', ' + str(top_data.stats("div")))
         
 
-    return True
+    return False
     
 
 ##
