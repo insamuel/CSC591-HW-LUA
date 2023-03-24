@@ -16,7 +16,7 @@ The first person we interviewed mentioned these ten games:
 
 Each following interviewee were asked about the same ten games. However, the attributes used to describe them were left to the individual to come up with. 
 
-The results of each interview can be found [here](https://github.com/insamuel/CSC591-HW-LUA/tree/hw4_writeup/etc/out/hw4_interview_output).
+The results of each interview can be found [here](https://github.com/insamuel/CSC591-HW-LUA/tree/main/etc/out/hw4_interview_output).
 
 Some of the common types of attributes selected by the interviewees to describe these games were:
 
