@@ -1,15 +1,8 @@
-from subprocess import call
-import os
-import csv
 import random
-import copy
-
 import Common
 import math
 import yaml
 from pathlib import Path
-
-from Sym import Sym
 
 ##
 # Imports call from subprocess, math, yaml and Path from pathlib
@@ -171,38 +164,6 @@ def per(t, p = 0.5):
     p = math.floor((p * len(t)) + 0.5)
     return t[max(1, min(len(t), p)) - 1]
 
-##
-# Call "fun" on each row. Row cells are divided in "the.seperator"
-#
-# Defines a function csv(fname, fun=None), which reads a CSV (Comma
-# Separated Values) file specified by fname, typecasts every cell in each
-# row to appropriate data type (int, bool or str) using the coerce()
-# function, and applies the function fun to every row of the CSV file, if
-# fun is specified.
-#
-# If fname is None or an empty string, an Exception is raised with message
-# "File not found". The separator used to split a row is specified in
-# Common.cfg['the']['separator']. The new line (\n) at the end of each row
-# is removed before typecasting the cells.
-##
-def read_csv(fname, fun=None):
-    if fname is None or len(fname.strip()) == 0:
-        raise Exception("File not found")
-    else:
-
-        #try to catch relative paths
-        if not os.path.isfile(fname):
-            fname = os.path.join(os.path.dirname(__file__), fname)
-
-        fname = os.path.abspath(fname)
-
-        csv_list = []
-        with open(fname, 'r') as csv_file:
-            csv_list = list(csv.reader(csv_file, delimiter=','))
-        
-        if fun != None:
-            for item in csv_list:
-                fun(item)
 
 ##
 # Function that processes command line arguments passed to the script. The
@@ -270,152 +231,85 @@ def cliffs_delta(nsA, nsB):
     return (abs(lt - gt) / n) > Common.cfg['the']['cliffs']
 
 
-def merge(col1, col2):# col is a num or a sym
-    col1_copy = copy.deepcopy(col1)
-    for item, count in col2.has.items():
-        for i in range(count):
-            col1_copy.add(item)
-    
-    return col1_copy
+##
+# Calculates an approximation of the error function, also known as the Gauss error function, for a
+# given input x
+##
+def erf(x):
+    # from Abramowitz and Stegun 7.1.26
+    # https://s3.amazonaws.com/nrbook.com/AandS-a4-v1-2.pdf
+    # (easier to read at https://en.wikipedia.org/wiki/Error_function#Approximation_with_elementary_functions)
+    a1  = 0.254829592
+    a2  = -0.284496736
+    a3  = 1.421413741
+    a4  = -1.453152027
+    a5  = 1.061405429
+    p   = 0.3275911
 
-def merge2(col1, col2): # col is a num or a sym
-    merged = merge(col1, col2)
-    if merged.div() <= (((col1.div() * col1.n) + (col2.div() * col2.n)) / merged.n):
-        return merged
-    return None
+    # Save the sign of x
+    sign = 1
 
-# A representation of a Num or Col without it's actual values represented. 
-class Range():
-    def __init__(self, txt: str = "", lo: float = -math.inf, hi: float = math.inf):
-        self.txt = txt
-        self.lo = lo
-        self.hi = hi
+    if x < 0:
+        sign = -1
 
+    x = math.abs(x)
 
-def merge_any(ranges0): #ranges0: sorted lists of ranges (nums)
+    # A&S formula 7.1.26
+    t = 1.0 / (1.0 + p*x)
+    y = 1.0 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t*math.exp(-x*x)
 
-    def get_no_gaps_ranges(t):
-        col_count = len(t)
-        out_list = [Range() for i in range(col_count)]
-        for j in range(col_count): # copy over the txt, high, and lo values
-            out_list[j].txt = t[j].txt
-            out_list[j].lo = t[j].lo
-            out_list[j].hi = t[j].hi
-
-        for j in range(1, col_count): # shift things
-            out_list[j].lo = t[j - 1].hi
-
-        out_list[0].lo = -math.inf
-        out_list[-1].hi = math.inf
-        return out_list
-
-    ranges1, j = [], 0
-    while j < len(ranges0):
-        left = ranges0[j]
-        to_add = left
-        right = ranges0[j + 1] if (j + 1) < len(ranges0) else None
-        if right != None:
-            y = merge2(left, right)
-            if y != None:
-                j+= 1
-                to_add = y
-        ranges1.append(to_add)
-        j+= 1
-    
-    return get_no_gaps_ranges(ranges0) if len(ranges0) == len(ranges1) else merge_any(ranges1)
-
-
-def get_value(has, nB = 1, nR = 1, goal = "True"):
-    b = 0
-    r = 0
-    for x, n in has.items():
-        if x == goal:
-            b+= n
-        else:
-            r+= n
-    b = b / (nB + 1 / float('inf'))
-    r = r / (nR + 1 / float('inf'))
-    return pow(b, 2) / (b + r)
+    return sign*y
 
 ##
-# Function sets the value of seed in the dictionary configs['the'] to x.
-# The configs dictionary holds the configuration data and the seed key in
-# it holds the value for a seed used for generating random numbers. This
-# function sets the value of seed to x.
+# Returns a sample from a Gaussian with mean `mu` and sd `sd`
 ##
-def set_seed(x):
-    configs['the']['seed'] = x
+def gaussian(mu = 0, sd = 1):
+    sq = math.sqrt
+    pi = math.pi
+    log = math.log
+    cos = math.cos
+    r = random.random
+    return mu + sd * sq(-2 * log(r())) * cos(2 * pi * r())
 
-##
-# Create a  RULE that groups `ranges` by their column id.
-# Each group is a disjunction of its contents (and sets of groups are conjunctions).
-#
-# Takes a list of ranges, a maximum size maxSize, and returns a pruned version of the ranges based on
-# their column id.
-#
-# Creates an empty dictionary t. For each range in the input list, checks if there is an existing key
-# in the dictionary t corresponding to the column id (range.txt). If the key doesn't exist, a new empty
-# list is created for that key. Range is then added to that list as a dictionary with keys 'lo', 'hi'
-# and 'at'.
-#
-# Prune function is called with the dictionary, t and maximum siz, maxSize.
-##
-def RULE(ranges, maxSize):
-    t = {}
-    for range in ranges:
-        if range.txt not in t:
-            t[range.txt] = []
-        t[range.txt].append({'lo': range.lo, 'hi': range.hi, 'at': range.at})
-    return prune(t, maxSize)
+
+def samples(t, n=0):
+    u = []
+    n = n or len(t)
+    for i in range(n):
+        u.append(t[random.randrange(len(t))])
+
+    return u
+
+def delta(i, other):
+    e, y, z = 1E-32, i, other
+    return abs(y.mu - z.mu) / math.pow( (e + math.pow(y.sd, 2)/y.n + math.pow(z.sd, 2)/z.n), 0.5)
+
+
+def RX(t, s = None):
+    t.sort()
+    return {"name": s or "", "rank": 0, "n": len(t), "show": "", "has": t}
 
 ##
-# Takes a dictionary rule, a dictionary maxSize, and returns a pruned version of rule based on the
-# values in maxSize.
-#
-# Initializes variable n to 0. For each key-value pair txt, ranges in input dictionary rule:
-#   increment n by 1
-#   length of ranges list = maxSize[txt], increments n by 1 again and set the key-value pair with
-#   key txt from rule to nil/none.
-#
-# After processing all key-value pairs in rule, if:
-#   n > 0, pruned rule is returned
-#   n = 0, returns None
+# Returns mean of numbers added.
 ##
-def prune(rule, maxSize):
-    n = 0
-    for txt, ranges in rule:
-        n += 1
-        if len(ranges) == maxSize[txt]:
-            n += 1
-            rule[txt] = None
-    if n > 0:
-        return rule
+def mid(self, t):
+    t = t["has"] if "has" in t else t
+    n = len(t) // 2
+    return len(t) % 2 == 0 and (t[n] + t[n + 1]) / 2 or t[n + 1]
 
-    ##
-    # Calculates an approximation of the error function, also known as the Gauss error function, for a
-    # given input x
-    ##
-    def erf(x):
-        # from Abramowitz and Stegun 7.1.26
-        # https://s3.amazonaws.com/nrbook.com/AandS-a4-v1-2.pdf
-        # (easier to read at https://en.wikipedia.org/wiki/Error_function#Approximation_with_elementary_functions)
-        a1  = 0.254829592
-        a2  = -0.284496736
-        a3  = 1.421413741
-        a4  = -1.453152027
-        a5  = 1.061405429
-        p   = 0.3275911
+##
+# Returns standard deviation of numbers added.
+##
+def div(self, t):
+    t = t["has"] if "has" in t else t
+    return (t[len(t) * 9 // 10] - t[len(t) * 1 // 10]) / 2.56
 
-        # Save the sign of x
-        sign = 1
 
-        if x < 0:
-            sign = -1
-
-        x = math.abs(x)
-
-        # A&S formula 7.1.26
-        t = 1.0 / (1.0 + p*x)
-        y = 1.0 - (((((a5*t + a4)*t) + a3)*t + a2)*t + a1)*t*math.exp(-x*x)
-
-        return sign*y
+def merge(rx1, rx2):
+    rx3 = RX([], rx1["name"])
+    for t in (rx1["has"], rx2["has"]):
+        for x in t:
+            rx3["has"].append(x)
+    rx3["has"].sort()
+    rx3["n"] = len(rx3["has"])
+    return rx3

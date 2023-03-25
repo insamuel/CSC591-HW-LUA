@@ -17,3 +17,8 @@ the:
   rest: 4
   sample: 512
   seed: 937162211.0
+  bootstrap: 512
+  conf: 0.05
+  cohen: 0.35
+#  Fmt: %6.2f
+  width: 40
