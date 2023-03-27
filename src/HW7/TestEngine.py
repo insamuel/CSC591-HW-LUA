@@ -63,7 +63,9 @@ def runs(testName):
         out = Common.eg[testName]()
     else:
         try:
-            out = Common.eg[testName]()
+            res = Common.eg[testName]()
+            out = res
+            status = res
         except:
             status = False
 

@@ -4,7 +4,10 @@ the:
   Max: 512
   Reuse: true
   bins: 16.0
-  cliffs: 0.147
+  bootstrap: 512.0
+  cliffs: 0.4
+  cohen: 0.35
+  conf: 0.05
   dump: false
   eg: ALL
   far: 0.95
@@ -17,8 +20,4 @@ the:
   rest: 4
   sample: 512
   seed: 937162211.0
-  bootstrap: 512
-  conf: 0.05
-  cohen: 0.35
-#  Fmt: %6.2f
   width: 40

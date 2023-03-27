@@ -2,7 +2,10 @@ import random
 import Common
 import math
 import yaml
+import functools
 from pathlib import Path
+
+from Num import Num
 
 ##
 # Imports call from subprocess, math, yaml and Path from pathlib
@@ -181,10 +184,10 @@ def cli(args, configs):
         arg_arr.remove("-e")
 
 
-    def find_arg_value(args: list[str], optionA: str, optionB: str, defaultValue) -> str:
-        if optionA not in args and optionB not in args:
+    def find_arg_value(args: list[str], optionA: str, defaultValue) -> str:
+        if optionA not in args:
             return defaultValue
-        index = args.index(optionA) if optionA in args else args.index(optionB)
+        index = args.index(optionA)
         if (index + 1) < len(args):
             return args[index + 1]
         return None
@@ -192,44 +195,68 @@ def cli(args, configs):
     configs['the']['help'] = '-h' in args or '--help' in args
     configs['the']['go'] = '-g' in args or '--go' in args
     configs['the']['quit'] = '-q' in args or '--quit' in args
-    configs['the']['bins'] = float(find_arg_value(arg_arr, '-b', '--bins', 16))
-    configs['the']['file'] = find_arg_value(arg_arr, '-f', '--file', '../../etc/data/auto93.csv')
-    configs['the']['cliffs'] = float(find_arg_value(arg_arr, '-c', '--cliffs', 0.147))
-    configs['the']['Far'] = float(find_arg_value(arg_arr, '-F', '--Far', 0.95))
-    configs['the']['Halves'] = float(find_arg_value(arg_arr, '-H', '--Halves', 512))
-    configs['the']['min'] = float(find_arg_value(arg_arr, '-m', '--min', 0.5))
-    configs['the']['Max'] = int(find_arg_value(arg_arr, '-M', '--Max', 512))
-    configs['the']['p'] = int(find_arg_value(arg_arr, '-p', '--p', 2))
-    configs['the']['rest'] = int(find_arg_value(arg_arr, '-r', '--rest', 4))
-    configs['the']['Reuse'] = bool(find_arg_value(arg_arr, '-R', '--Reuse', True))
-    configs['the']['seed'] = float(find_arg_value(arg_arr, '-s', '--seed', 937162211))
+    configs['the']['bootstrap'] = float(find_arg_value(arg_arr, '--bootstrap', 512))
+    configs['the']['conf'] = find_arg_value(arg_arr, '--conf', 0.05)
+    configs['the']['cliffs'] = float(find_arg_value(arg_arr, '--cliffs', 0.4))
+    configs['the']['cohen'] = float(find_arg_value(arg_arr,'--cohen', 0.35))
 
     return configs
 
 def many(list, count):
     return random.choices(list, k = count)
 
-def cliffs_delta(nsA, nsB):
-    if len(nsA) > 256:
-        nsA = many(nsA, 256)
-    if len(nsB) > 256:
-        nsB = many(nsB, 256)
-    if len(nsA) > 10 * len(nsB):
-        nsA = many(nsA, 10 * len(nsB))
-    if len(nsB) > 10 * len(nsA):
-        nsB = many(nsB, 10 * len(nsA))
+def cliffs_delta(ns1, ns2):
+    if len(ns1) > 128:
+        ns1 = samples(ns1, 128)
+    if len(ns2) > 128:
+        ns2 = samples(ns2, 128)
 
     n, gt, lt = 0, 0, 0
-    for itemA in nsA:
-        for itemB in nsB:
+    for item1 in ns1:
+        for item2 in ns2:
             n+= 1
-            if itemA > itemB:
+            if item1 > item2:
                 gt+= 1
-            if itemA < itemB:
+            if item1 < item2:
                 lt+= 1
     
-    return (abs(lt - gt) / n) > Common.cfg['the']['cliffs']
+    return (abs(lt - gt) / n) <= Common.cfg['the']['cliffs']
 
+def bootstrap(y0, z0):
+    x = Num() # x will hold all of y0,z0
+    y = Num() # y contains just y0
+    z = Num() # z contains just z0
+
+    for item in y0:
+        y.add(item)
+        x.add(item)
+    for item in z0:
+        z.add(item)
+        x.add(item)
+
+    xmu = x.mu
+    ymu = y.mu
+    zmu = z.mu
+
+    yhat = []
+    zhat = []
+    # yhat and zhat are y,z fiddled to have the same mean
+    for item in y0:
+        yhat.append(item - ymu + xmu)
+    for item in z0:
+        zhat.append(item - zmu + xmu)
+
+    # tobs is some difference seen in the whole space
+    tobs = delta(y, z)
+    n = 0
+    for i in range(int(Common.cfg['the']['bootstrap'])):
+        # here we look at some delta from just part of the space
+        # it the part delta is bigger than the whole, then increment n
+        if delta(Num(samples(yhat)), Num(samples(zhat))) > tobs:
+            n+=1
+    
+    # if we have seen enough n, then we are the same
+    return n / float(Common.cfg['the']['bootstrap']) >= float(Common.cfg['the']['conf'])
 
 ##
 # Calculates an approximation of the error function, also known as the Gauss error function, for a
@@ -268,7 +295,7 @@ def gaussian(mu = 0, sd = 1):
     pi = math.pi
     log = math.log
     cos = math.cos
-    r = random.random
+    r = rand
     return mu + sd * sq(-2 * log(r())) * cos(2 * pi * r())
 
 
@@ -313,3 +340,40 @@ def merge(rx1, rx2):
     rx3["has"].sort()
     rx3["n"] = len(rx3["has"])
     return rx3
+
+def scott_knot(rxs):
+    def merges(i, j):
+        out = RX([], rxs[i]['name'])
+        for k in range(i, j):
+            out = merge(out, rxs[j])
+        return out
+    
+    def same(lo, cut, hi):
+        l = merges(lo, cut)
+        r = merges(cut + 1, hi)
+        return cliffs_delta(l['has'], r['has']) and bootstrap(l['has'], r['has'])
+    
+    def recurse(lo, hi, rank):
+        b4 = merges(lo, hi)
+        cut = None
+        best = 0
+        for j in range(lo, hi):
+            if j < hi:
+                l = merges(lo, j)
+                r = merges(j + 1, hi)
+                now = (l['n'] * ((mid(l) - mid(b4))**2) + r['n'] * ((mid(r) - mid(b4))**2)) / (l['n'] + r['n'])
+                if now > best:
+                    if abs(mid(l) - mid(r)) >= Common.cfg['the']['cohen']:
+                        cut = j
+                        best = now
+        if cut != None and not same(lo, cut, hi):
+            rank = recurse(lo, cut, hi)
+            rank = recurse(cut + 1, hi, rank)
+        else:
+            for i in range(lo, hi):
+                rxs[i]['rank'] = rank
+        
+        sorted_rxs = sorted(rxs, key=functools.cmp_to_key(mid))
+        cohen = div(merges(1, len(sorted_rxs)))
+        recurse(1, len(rxs), 1)
+        return rxs

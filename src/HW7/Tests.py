@@ -2,7 +2,7 @@ import sys
 import TestEngine
 import Common
 from Num import Num
-from Utils import rnd, canPrint, rand, cliffs_delta, gaussian, samples
+from Utils import rnd, canPrint, rand, cliffs_delta, gaussian, samples, bootstrap
 
 command_line_args = []
 
@@ -23,28 +23,31 @@ def eg_the():
     canPrint(Common.cfg['the'], 'Should be able to print the')
     return True
 
-
-@TestEngine.test 
-def test_cliffs():
-    if cliffs_delta([8,7,6,2,5,8,7,3],[8,7,6,2,5,8,7,3]) or not cliffs_delta([8,7,6,2,5,8,7,3],[9,9,7,8,10,9,6]):
-        return False
-
-    t1, t2 = [], []
-    for i in range(1000):
-        t1.append(rand())
-        t2.append(pow(rand(), 0.5))
-    
-    if cliffs_delta(t1, t1) or not cliffs_delta(t1, t2):
-        return False
-
-    diff, j = False, 1.0
-    while not diff:
-        t3 = list(map(lambda x: x * j, t1))
-        diff = cliffs_delta(t1, t3)
-        print('> ' + str(rnd(j)) + ' ' + str(diff))
-        j*= 1.025
-
+@TestEngine.test
+def test_gauss():
+    t = []
+    for i in range(10**4):
+        t.append(gaussian(10,2))
+    n=Num(t)
+    print("\t", n.n, n.mu, n.sd)
     return True
+
+
+@TestEngine.test
+def test_basic():
+    listA = [8, 7, 6, 2, 5, 8, 7, 3]
+    listB = [9, 9, 7, 8, 10, 9, 6]
+
+    listC = [0.34, 0.49, 0.51, 0.6, .34, .49, .51, .6]
+    listD = [0.6,  0.7,  0.8, 0.9, .6, .7, .8, .9]
+
+    print('\t\tTrue\t' + str(bootstrap(listA, listA)) + '\t' + str(cliffs_delta(listA, listA)))
+    print('\t\tFalse\t' + str(bootstrap(listA, listB)) + '\t' + str(cliffs_delta(listA, listB)))
+    print('\t\tFalse\t' + str(bootstrap(listC, listD)) + '\t' + str(cliffs_delta(listC, listD)))
+    
+    return True
+
+
 
 @TestEngine.test
 def test_num():
@@ -62,17 +65,38 @@ def test_sample():
 
 
 @TestEngine.test
-def test_gauss():
-    t = []
-    for i in range(10**4):
-        t.append(gaussian(10,2))
-    n=Num(t)
-    print("\t", n.n, n.mu, n.sd)
+def test_bootstrap():
+    a = []
+    b = []
+    for i in range(100):
+        a.append(gaussian(10, 1))
+    print('\tmu\tsd\tcliffs\tboot\tboth')
+    print('\t--\t--\t------\t----\t----')
+
+    mu = 10.0
+    for i in range(11):
+        b.append(gaussian(mu, 1))
+    
+        cl = cliffs_delta(a, b)
+        bs = bootstrap(a, b)
+        print('\t' + str(rnd(mu, 1)) + '\t1\t' + str(cl) + '\t' + str(bs) + '\t' + str(cl and bs))
+        
+        mu+= 0.1
     return True
 
-
-
-
+@TestEngine.test
+def test_pre():
+    print("eg3")
+    d = 1
+    for i in range(10):
+        t1 = []
+        t2 = []
+        for j in range(32):
+            t1.append(gaussian(10, 1))
+            t2.append(gaussian(d * 10, 1))
+        print('\t' + str(rnd(d)) + '\t' + str(d < 1.1) + '\t' + str(bootstrap(t1, t2)) + '\t' + str(bootstrap(t1, t1)))
+        d+= 0.5
+    return True
 ##
 # Defines a function ALL using @TestEngine.test. This function calls other
 # functions, whose names start with eg_, stored in Common.eg, one by one,
@@ -87,7 +111,8 @@ def ALL():
             print('\n' + "---------------------------------------")
             if not TestEngine.runs(k):
                 Common.fails += 1
-    return True
+    return Common.fails == 0
+
 
 ##
 # Checks if the script is being run as the main program and if so, it calls
