@@ -377,3 +377,39 @@ def scott_knot(rxs):
         cohen = div(merges(1, len(sorted_rxs)))
         recurse(1, len(rxs), 1)
         return rxs
+
+
+def tiles(rxs):
+    huge, min_f, max_f, floor = float("inf"), min, max, math.floor
+    lo, hi = huge, -huge
+    for rx in rxs:
+        lo = min_f(lo, rx["has"][0])
+        hi = max_f(hi, rx["has"][-1])
+    for rx in rxs:
+        t, u = rx["has"], []
+
+        def of(x, most):
+            return max(1, min_f(most, x))
+
+        def at(x):
+            return t[of(int(len(t) * x), len(t) - 1)]
+
+        def pos(x):
+            return floor(of(Common.cfg['the']['width'] * (x - lo) / (hi - lo + 1E-32) // 1, Common.cfg['the']['width']))
+
+        for _ in range(Common.cfg['the']['width']):
+            u.append(" ")
+        a, b, c, d, e = at(.1), at(.3), at(.5), at(.7), at(.9)
+        A, B, C, D, E = pos(a), pos(b), pos(c), pos(d), pos(e)
+        for i in range(A, B):
+            u[i] = "-"
+        for i in range(D, E):
+            u[i] = "-"
+
+        u[Common.cfg['the']['width'] // 2] = "|"
+        u[C] = "*"
+        rx["show"] = "".join(u) + " { %6.2f" % a + "}"
+        for x in (b, c, d, e):
+            rx["show"] += ", %6.2f" % a
+        rx["show"] += " }"
+    return rxs
