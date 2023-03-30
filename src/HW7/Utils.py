@@ -319,7 +319,7 @@ def RX(t, s = None):
 ##
 # Returns mean of numbers added.
 ##
-def mid(self, t):
+def mid(t):
     t = t["has"] if "has" in t else t
     n = len(t) // 2
     return len(t) % 2 == 0 and (t[n] + t[n + 1]) / 2 or t[n + 1]
@@ -327,7 +327,7 @@ def mid(self, t):
 ##
 # Returns standard deviation of numbers added.
 ##
-def div(self, t):
+def div(t):
     t = t["has"] if "has" in t else t
     return (t[len(t) * 9 // 10] - t[len(t) * 1 // 10]) / 2.56
 
@@ -373,10 +373,10 @@ def scott_knot(rxs):
             for i in range(lo, hi):
                 rxs[i]['rank'] = rank
         
-        sorted_rxs = sorted(rxs, key=functools.cmp_to_key(mid))
-        cohen = div(merges(1, len(sorted_rxs)))
-        recurse(1, len(rxs), 1)
-        return rxs
+    sorted_rxs = sorted(rxs, key=functools.cmp_to_key(mid))
+    cohen = div(merges(1, len(sorted_rxs) - 1))
+    recurse(0, len(sorted_rxs) - 1, 1)
+    return sorted_rxs
 
 
 def tiles(rxs):
