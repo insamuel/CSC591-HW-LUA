@@ -362,7 +362,7 @@ def scott_knot(rxs):
         cut = None
         b4 = merges(lo, hi)
         best = 0
-        for j in range(lo, hi + 1):
+        for j in range(lo, hi):
             if j < hi:
                 l = merges(lo, j)
                 r = merges(j + 1, hi)
@@ -374,7 +374,7 @@ def scott_knot(rxs):
             rank = recurse(lo, cut, rank) + 1
             rank = recurse(cut + 1, hi, rank)
         else:
-            for i in range(lo, hi + 1):
+            for i in range(lo, hi):
                 rxs[i]["rank"] = rank
         return rank
 
@@ -394,7 +394,7 @@ def tiles(rxs):
         t, u = rx["has"], []
 
         def of(x, most):
-            return max(1, min_f(most, x))
+            return max(0, min_f(most, x))
 
         def at(x):
             return t[of(int(len(t) * x), len(t) - 1)]
@@ -411,10 +411,10 @@ def tiles(rxs):
         for i in range(D, E):
             u[i] = "-"
 
-        u[Common.cfg['the']['width'] // 2] = "|"
+        u[(Common.cfg['the']['width'] // 2) - 1] = "|"
         u[C] = "*"
         rx["show"] = "".join(u) + " { %6.2f" % a + "}"
         for x in (b, c, d, e):
-            rx["show"] += ", %6.2f" % a
+            rx["show"] += ", %6.2f" % x
         rx["show"] += " }"
     return rxs
