@@ -106,8 +106,8 @@ def eg_pre():
         for j in range(32):
             t1.append(gaussian(10, 1))
             t2.append(gaussian(d * 10, 1))
-        print('\t' + str(rnd(d)) + '\t' + str(d < 1.1) + '\t' + str(bootstrap(t1, t2)) + '\t' + str(bootstrap(t1, t1)))
-        d+= 0.5
+        print('\t' + ('%.2f' % rnd(d))  + '\t' + str(d < 1.1) + '\t' + str(bootstrap(t1, t2)) + '\t' + str(bootstrap(t1, t1)))
+        d+= 0.05
     return True
 
 
