@@ -254,7 +254,7 @@ def bootstrap(y0, z0):
         # it the part delta is bigger than the whole, then increment n
         if delta(Num(samples(yhat)), Num(samples(zhat))) > tobs:
             n+=1
-    
+
     # if we have seen enough n, then we are the same
     return n / float(Common.cfg['the']['bootstrap']) >= float(Common.cfg['the']['conf'])
 
@@ -341,42 +341,47 @@ def merge(rx1, rx2):
     rx3["n"] = len(rx3["has"])
     return rx3
 
+
 def scott_knot(rxs):
     def merges(i, j):
-        out = RX([], rxs[i]['name'])
-        for k in range(i, j):
+        out = RX([], rxs[i]["name"])
+        for k in range(i, j + 1):
             out = merge(out, rxs[j])
         return out
-    
+
     def same(lo, cut, hi):
         l = merges(lo, cut)
         r = merges(cut + 1, hi)
-        return cliffs_delta(l['has'], r['has']) and bootstrap(l['has'], r['has'])
-    
+        x = cliffs_delta(l["has"], r["has"])
+        if x == True:
+            return bootstrap(l["has"], r["has"])
+        else:
+            return x
+
     def recurse(lo, hi, rank):
-        b4 = merges(lo, hi)
         cut = None
+        b4 = merges(lo, hi)
         best = 0
-        for j in range(lo, hi):
+        for j in range(lo, hi + 1):
             if j < hi:
                 l = merges(lo, j)
                 r = merges(j + 1, hi)
-                now = (l['n'] * ((mid(l) - mid(b4))**2) + r['n'] * ((mid(r) - mid(b4))**2)) / (l['n'] + r['n'])
+                now = (l["n"] * (mid(l) - mid(b4)) ** 2 + r["n"] * (mid(r) - mid(b4)) ** 2) / (l["n"] + r["n"])
                 if now > best:
-                    if abs(mid(l) - mid(r)) >= Common.cfg['the']['cohen']:
-                        cut = j
-                        best = now
-        if cut != None and not same(lo, cut, hi):
-            rank = recurse(lo, cut, hi)
+                    if abs(mid(l) - mid(r)) > cohen:
+                        cut, best = j, now
+        if cut and not same(lo, cut, hi):
+            rank = recurse(lo, cut, rank) + 1
             rank = recurse(cut + 1, hi, rank)
         else:
-            for i in range(lo, hi):
-                rxs[i]['rank'] = rank
-        
-    sorted_rxs = sorted(rxs, key=functools.cmp_to_key(mid))
-    cohen = div(merges(1, len(sorted_rxs) - 1))
-    recurse(0, len(sorted_rxs) - 1, 1)
-    return sorted_rxs
+            for i in range(lo, hi + 1):
+                rxs[i]["rank"] = rank
+        return rank
+
+    rxs.sort(key=lambda x: mid(x))
+    cohen = div(merges(0, len(rxs) - 1)) * Common.cfg['the']['cohen']
+    recurse(0, len(rxs) - 1, 1)
+    return rxs
 
 
 def tiles(rxs):
