@@ -35,7 +35,7 @@ Repository for all homeworks for CSC591. Output files are located in \etc\out
 
 - To run HW6, navigate to \src\HW6 and run 'python xpln.py'. HW6 tests are contained in \src\HW6 and can be run all together by 'python Tests.py'.
 
-- HW7: IN PROGRESS
+- To run HW7, navigate to \src\HW7 and run 'python stats.py'. HW7 tests are contained in \src\HW7 and can be run all together by 'python Tests.py'.
 
 
 
