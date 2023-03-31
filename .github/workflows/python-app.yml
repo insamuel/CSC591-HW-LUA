@@ -46,3 +46,9 @@ jobs:
         run: |
           cd src/HW6
           python Tests.py
+          
+      - name: Run HW7 Tests 
+        run: |
+          cd src/HW7
+          python Tests.py
+    

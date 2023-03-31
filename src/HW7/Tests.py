@@ -3,7 +3,7 @@ import TestEngine
 import Common
 import random
 from Num import Num
-from Utils import rnd, canPrint, rand, cliffs_delta, gaussian, samples, bootstrap, RX, scott_knot, tiles, mid
+from Utils import rnd, canPrint, cliffs_delta, gaussian, samples, bootstrap, RX, scott_knot, tiles, mid
 
 command_line_args = []
 
@@ -24,7 +24,6 @@ command_line_args = []
 @TestEngine.test
 def eg_the():
     canPrint(Common.cfg['the'], 'Should be able to print the')
-
     return True
 
 
@@ -47,7 +46,6 @@ def eg_sample():
 def eg_num():
     n = Num([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
     print(n.n, n.mu, n.sd)
-
     return True
 
 
@@ -59,7 +57,6 @@ def eg_gauss():
         t.append(gaussian(10,2))
     n=Num(t)
     print("\t", n.n, n.mu, n.sd)
-
     return True
 
 
@@ -81,7 +78,6 @@ def eg_bootstrap():
         print('\t' + str(rnd(mu, 1)) + '\t1\t' + str(cl) + '\t' + str(bs) + '\t' + str(cl and bs))
 
         mu += 0.1
-
     return True
 
 
@@ -110,9 +106,8 @@ def eg_pre():
         for j in range(32):
             t1.append(gaussian(10, 1))
             t2.append(gaussian(d * 10, 1))
-        print('\t' + str(rnd(d)) + '\t' + str(d < 1.1) + '\t' + str(bootstrap(t1, t2)) + '\t' + str(bootstrap(t1, t1)))
-        d+= 0.5
-
+        print('\t' + ('%.2f' % rnd(d))  + '\t' + str(d < 1.1) + '\t' + str(bootstrap(t1, t2)) + '\t' + str(bootstrap(t1, t1)))
+        d+= 0.05
     return True
 
 
@@ -127,7 +122,6 @@ def eg_five():
     tiles_sk = tiles(sk)
     for rx in tiles_sk:
         print(rx["name"], rx["rank"], rx["show"])
-
     return True
 
 
@@ -141,7 +135,6 @@ def eg_six():
     tiles_sk = tiles(sk)
     for rx in tiles_sk:
         print(rx["name"], rx["rank"], rx["show"])
-
     return True
 
 
@@ -173,7 +166,6 @@ def eg_tiles():
     rxs.sort(key=lambda a: mid(a))
     for rx in tiles(rxs):
         print("",rx["name"],rx["show"])
-
     return True
 
 
